@@ -13,14 +13,9 @@ FRONT = "front"
 SIDE = "side"
 TOP = "top"
 
-view = widgets.Dropdown(
-    options=[FRONT, SIDE, TOP],
-    value=FRONT,
-    description='Slice Axi:',
-    disabled=False,
-)
+view = np.linspace(0, 2, 3)
 
-slice = np.linspace(0, 175, 176)
+slice = np.linspace(0, 200, 201)
 
 x = np.linspace(0, 250, 251)
 y = np.linspace(0, 250, 251)
@@ -84,10 +79,14 @@ def sitk_show(img, title=None, margin=0.05, dpi=40):
     mng.window.state('zoomed') #works fine on Windows!
 
 
-def label_area(center_x: int, center_y: int, hu_min: int, hu_max: int, slice:int):
-    #img2d = [[], []]
-
-    img2d = imgOriginal[:, :, int(slice)]
+def label_area(center_x: int, center_y: int, hu_min: int, hu_max: int, slice:int, view):
+    img2d = ""
+    if view == 0:
+        img2d = imgOriginal[int(slice), :, :]
+    if view == 1:
+        img2d = imgOriginal[:, int(slice), :]
+    if view == 2:
+        img2d = imgOriginal[:, :, int(slice)]
 
     img2dSmooth = SimpleITK.CurvatureFlow(image1=img2d, timeStep=0.125, numberOfIterations=5)
 
@@ -111,7 +110,7 @@ def label_area(center_x: int, center_y: int, hu_min: int, hu_max: int, slice:int
                                                               foregroundValue=labelWhiteMatter)
     return SimpleITK.GetArrayFromImage(SimpleITK.LabelOverlay(imgSmoothInt, imgWhiteMatterNoHoles))
 
-controls = iplt.imshow(label_area, center_x=x, center_y=y, hu_min = lover, hu_max = upper, slice = slice)
+controls = iplt.imshow(label_area, center_x=x, center_y=y, hu_min = lover, hu_max = upper, slice = slice, view = view)
 
 plt.set_cmap("gray")
 plt.show()
