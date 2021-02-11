@@ -18,8 +18,8 @@ from plotly.graph_objs import *
 print("importing is finished successfully")
 
 # Taking the data path
-ROOT_DIR = "E:/orto-ray/dicom_data/"#os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(ROOT_DIR, 'input/Chest/')
+ROOT_DIR = "E:/orto-ray/"#os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(ROOT_DIR, 'dicom_data/Chest/')
 print(data_path)
 output_path = working_path = os.path.join(ROOT_DIR, "Output/")
 g = glob(data_path + '/*.dcm')
@@ -83,7 +83,7 @@ print("Finshed Hounsfield scaling successfully")
 
 # saving the images
 print("Saving The Images")
-np.save(output_path + "fullimages_%d.npy" % (id), imgs)
+#np.save(output_path + "fullimages_%d.npy" % (id), imgs)
 temp_str = str(output_path + "fullimages_%d.npy" % (id))
 print("Successfully Saved The Images to" + temp_str)
 
