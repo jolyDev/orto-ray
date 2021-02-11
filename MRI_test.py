@@ -18,7 +18,7 @@ from plotly.graph_objs import *
 print("importing is finished successfully")
 
 # Taking the data path
-ROOT_DIR = "E:/Medical_Dicom_3D-master/"#os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = "E:/orto-ray/dicom_data/"#os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(ROOT_DIR, 'input/Chest/')
 print(data_path)
 output_path = working_path = os.path.join(ROOT_DIR, "Output/")
