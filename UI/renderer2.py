@@ -1,81 +1,47 @@
 import sys
-from PyQt5 import *
-from PyQt5.QtGui import *
+
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+import pyvi
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
+import numpy as np
 
-import random
+class WindowX(QMainWindow):
+    def __init__(self, data):
+        super().__init__()
 
-class Window(QWidget):
-    def __init__(self, img_pack, parent=None):
-        super(Window, self).__init__(parent)
+        title = "Matplotlib Embeding In PyQt5"
+        top = 400
+        left = 400
+        width = 900
+        height = 500
 
-        # a figure instance to plot on
-        self.figure = Figure()
+        self.setWindowTitle(title)
+        self.setGeometry(top, left, width, height)
+        self.data = data
+        self.MyUI()
 
-        # this is the Canvas Widget that displays the `figure`
-        # it takes the `figure` instance as a parameter to __init__
-        self.canvas = FigureCanvas(self.figure)
+    def MyUI(self):
+        canvas = Canvas(self.data, self, width=8, height=4)
+        canvas.move(0, 0)
 
-        # this is the Navigation widget
-        # it takes the Canvas widget and a parent
-        self.toolbar = NavigationToolbar(self.canvas, self)
+class Canvas(FigureCanvas):
+    def __init__(self, data ,parent=None, width=5, height=5, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        self.data = data
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
 
-        # Just some button connected to `plot` method
-        self.button = QPushButton('Plot')
-        self.button.clicked.connect(self.plot)
-
-        self.plotx(img_pack)
-
-        # set the layout
-        layout = QVBoxLayout()
-        layout.addWidget(self.toolbar)
-        layout.addWidget(self.canvas)
-        layout.addWidget(self.button)
-        self.setLayout(layout)
-
-    def plotx(self, img_pack):
-        ''' plot some random stuff '''
-        # random data
-        data = [random.random() for i in range(10)]
-
-        # create an axis
-        ax = self.figure.add_subplot(111)
-
-        # discards the old graph
-        ax.clear()
-
-        # plot data
-        ax.imshow(img_pack)
-
-        # refresh canvas
-        self.canvas.draw()
-
+        self.plot()
 
     def plot(self):
-        ''' plot some random stuff '''
-        # random data
-        data = [random.random() for i in range(10)]
-
-        # create an axis
-        ax = self.figure.add_subplot(111)
-
-        # discards the old graph
-        ax.clear()
+        self.axes.clear()
 
         # plot data
-        ax.plot(data, '*-')
+        self.axes.imshow(self.data)
 
-        # refresh canvas
-        self.canvas.draw()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    main = Window()
-    main.show()
-
-    sys.exit(app.exec_())
+        self.draw()

@@ -73,7 +73,7 @@ class SliceView(QWidget):
         x = img_pack
         y = array_to_pixmap(x)
         label.setPixmap(QPixmap(img))
-        return renderer2.Window(img_pack)
+        return renderer2.WindowX(img_pack)
 
     def clickme(self):
         self.image.setPixmap(QPixmap(r"E:\muse\models\truck.jpg"))
