@@ -6,6 +6,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import pyvi
 import numpy as np
+from Slider import Slider
 from PIL import Image
 
 import renderer2
@@ -29,33 +30,26 @@ class View(Enum):
     PROFILE = 1
     HORIZONTAL = 2
 
-def _GetName(view) -> str:
-    if view == View.FRONTAL:
-        return "frontal"
-    if view == View.PROFILE:
-        return "profile"
-    if view == View.FRONTAL:
-        return "horizontal"
-
-
 class SliceView(QWidget):
 
-    def _Get2dSlice():
-        if view == View.FRONTAL:
-            return "frontal"
-        if view == View.PROFILE:
-            return "profile"
-        if view == View.FRONTAL:
-            return "horizontal"
+    def _GetTitle(self) -> str:
+        if self.view == View.FRONTAL:
+            return "Frontal"
+        if self.view == View.PROFILE:
+            return "Profile"
+        if self.view == View.HORIZONTAL:
+            return "Horizontal"
 
-    def __init__(self, parent, view: View, img_pack):
+    def __init__(self, parent, view: View, data_manager):
         super().__init__()
 
         self.parent = parent
         self.view = view
-        self.image = self.getImage(img_pack)
-        self.button = QPushButton("Button two")
-        self.title = _GetName(self.view)
+        self.data_manager = data_manager
+        self.slider = Slider(self, 0, 100, self.updateImage)
+        self.title = self._GetTitle()
+
+        self.image = renderer2.WindowX(self.getImage())
         # setting title
         self.UiComponents()
 
@@ -64,16 +58,18 @@ class SliceView(QWidget):
 
         # method for widgets
 
-    def getImage(self, img_pack):
-        label = QLabel(self.parent)
+    def getImage(self):
+        index = self.slider.getIndex()
+        image = ""
+        if self.view == View.FRONTAL:
+            return self.data_manager.getSliceYZ(index)
+        if self.view == View.PROFILE:
+            return self.data_manager.getSliceXZ(index)
+        if self.view == View.HORIZONTAL:
+            return self.data_manager.getSliceXY(index)
 
-        plt.imshow(img_pack)
-        img = plt.savefig('books_read.png')
-        i = 20
-        x = img_pack
-        y = array_to_pixmap(x)
-        label.setPixmap(QPixmap(img))
-        return renderer2.WindowX(img_pack)
+    def updateImage(self):
+        self.image.draw(self.getImage())
 
     def clickme(self):
         self.image.setPixmap(QPixmap(r"E:\muse\models\truck.jpg"))
@@ -82,13 +78,11 @@ class SliceView(QWidget):
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)
-        self.button.clicked.connect(self.clickme)
 
         vbox.addWidget(QLabel(self.title))
         vbox.addWidget(self.image)
-        vbox.addWidget(self.button)
+        vbox.addWidget(self.slider)
 
-        # adding action to a button
-        self.button.clicked.connect(self.clickme)
+        self.setLayout(vbox)
 
 

@@ -22,11 +22,12 @@ class WindowX(QMainWindow):
         self.setWindowTitle(title)
         self.setGeometry(top, left, width, height)
         self.data = data
-        self.MyUI()
+        self.canvas = Canvas(self.data, self, width=8, height=4)
+        self.canvas.move(0, 0)
 
-    def MyUI(self):
-        canvas = Canvas(self.data, self, width=8, height=4)
-        canvas.move(0, 0)
+    def draw(self, data):
+        self.canvas.setNewData(data)
+        self.canvas.plot()
 
 class Canvas(FigureCanvas):
     def __init__(self, data ,parent=None, width=5, height=5, dpi=100):
@@ -45,3 +46,6 @@ class Canvas(FigureCanvas):
         self.axes.imshow(self.data)
 
         self.draw()
+
+    def setNewData(self, data):
+        self.data = data

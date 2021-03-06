@@ -4,24 +4,22 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import pyvi
 
-from slice import SliceView, View
-from segmentation.region_growing_manager import getImages
+from Slice import SliceView, View
+from segmentation.segmentation_manager import SegmentationManager
 
 class Window(QWidget):
 
     def __init__(self):
         super().__init__()
 
-        img = getImages()
-        self.frontal_view = SliceView(self, View.FRONTAL, img)
-        self.profile_view = SliceView(self, View.PROFILE, img)
-        self.horizontal_view = SliceView(self, View.HORIZONTAL, img)
+        self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/head")
+        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager)
+        self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager)
+        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager)
         #self.model = SliceView(self, "model", r'C:\athena.jpg')
-        # setting title
-        self.setWindowTitle("Ortho ray ")
+        self.setWindowTitle("Ortho Ray")
         self.UiComponents()
 
-        # showing all the widgets
         self.show()
 
 
