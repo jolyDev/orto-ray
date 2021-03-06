@@ -55,11 +55,15 @@ cid = plt.figure().canvas.mpl_connect('button_press_event', onclick)
 
 pathDicom = "E:/orto-ray/dicom_data/head"
 
-reader = SimpleITK.ImageSeriesReader()
-filenamesDICOM = reader.GetGDCMSeriesFileNames(pathDicom)
-reader.SetFileNames(filenamesDICOM)
-imgOriginal = reader.Execute()
 
+def getImages():
+    reader = SimpleITK.ImageSeriesReader()
+    filenamesDICOM = reader.GetGDCMSeriesFileNames(pathDicom)
+    reader.SetFileNames(filenamesDICOM)
+    imgOriginal= reader.Execute()
+    img2d = imgOriginal[int(20), :, :]
+    sitk_show(img2d)
+    return SimpleITK.GetArrayFromImage(imgOriginal[int(20), :, :])
 
 def sitk_show(img, title=None, margin=0.05, dpi=40):
     nda = SimpleITK.GetArrayFromImage(img)
@@ -76,7 +80,6 @@ def sitk_show(img, title=None, margin=0.05, dpi=40):
         plt.title(title)
 
     mng = plt.get_current_fig_manager()
-    mng.window.state('zoomed') #works fine on Windows!
 
 
 def label_area(center_x: int, center_y: int, hu_min: int, hu_max: int, slice:int, view):
@@ -110,7 +113,7 @@ def label_area(center_x: int, center_y: int, hu_min: int, hu_max: int, slice:int
                                                               foregroundValue=labelWhiteMatter)
     return SimpleITK.GetArrayFromImage(SimpleITK.LabelOverlay(imgSmoothInt, imgWhiteMatterNoHoles))
 
-controls = iplt.imshow(label_area, center_x=x, center_y=y, hu_min = lover, hu_max = upper, slice = slice, view = view)
+#controls = iplt.imshow(label_area, center_x=x, center_y=y, hu_min = lover, hu_max = upper, slice = slice, view = view)
 
-plt.set_cmap("gray")
-plt.show()
+#plt.set_cmap("gray")
+#plt.show()
