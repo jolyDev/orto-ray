@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 import pyvi
 
 from Slice import SliceView, View
+from RangeSlider import RangeSliderHU
 from segmentation.segmentation_manager import SegmentationManager
 
 class Window(QWidget):
@@ -22,8 +23,14 @@ class Window(QWidget):
 
         self.show()
 
+    def updateLabeling(self, min, max):
+        self.frontal_view.updateLabelImage(min, max)
+        self.profile_view.updateLabelImage(min, max)
+        self.horizontal_view.updateLabelImage(min, max)
 
     def UiComponents(self):
+        hbox = QHBoxLayout(self)
+
         grid = QGridLayout(self)
 
         grid.addWidget(self.horizontal_view,0,0)
@@ -31,6 +38,8 @@ class Window(QWidget):
         grid.addWidget(self.profile_view,1,0)
         grid.addWidget(self.frontal_view,1,1)
 
+        hbox.addLayout(grid)
+        hbox.addWidget(RangeSliderHU("hu", 15, 35, 0, 255, self.updateLabeling))
         self.showMaximized()
 
 if __name__ == '__main__':

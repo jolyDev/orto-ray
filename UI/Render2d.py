@@ -10,20 +10,25 @@ from matplotlib.figure import Figure
 import numpy as np
 
 class WindowX(QMainWindow):
-    def __init__(self, data):
+    def __init__(self, data, apply, reset):
         super().__init__()
 
         title = "Matplotlib Embeding In PyQt5"
-        top = 400
-        left = 400
-        width = 900
-        height = 500
 
         self.setWindowTitle(title)
-        self.setGeometry(top, left, width, height)
         self.data = data
         self.canvas = Canvas(self.data, self, width=8, height=4)
         self.canvas.move(0, 0)
+        self.canvas.mpl_connect('button_press_event', self.onClick)
+
+        self.apply = apply
+        self.reset = reset
+
+    def onClick(self, event):
+        if not event.button == 1:
+            self.reset()
+        else:
+            self.apply(event.xdata, event.ydata)
 
     def draw(self, data):
         self.canvas.setNewData(data)

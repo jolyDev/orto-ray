@@ -9,7 +9,7 @@ import numpy as np
 from Slider import Slider
 from PIL import Image
 
-import renderer2
+import Render2d
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -29,6 +29,12 @@ class View(Enum):
     FRONTAL = 0
     PROFILE = 1
     HORIZONTAL = 2
+
+class Point():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
 
 class SliceView(QWidget):
 
@@ -55,16 +61,21 @@ class SliceView(QWidget):
         self.view = view
         self.data_manager = data_manager
         self.slider = Slider(self, 0, self._GetSliderMax(), self.updateImage)
-        self.title = self._GetTitle()
 
-        self.image = renderer2.WindowX(self.getImage())
-        # setting title
         self.UiComponents()
+
+        self.anchor = None
 
         # showing all the widgets
         self.show()
 
         # method for widgets
+
+    def resetAnchorPoint(self, x, y):
+        self.anchor = None
+
+    def setNewAnchorPoint(self, x, y):
+        self.anchor = Point(x, y)
 
     def rotate(self, image):
         return np.rot90(image, 3)
@@ -81,6 +92,15 @@ class SliceView(QWidget):
     def updateImage(self):
         self.image.draw(self.getImage())
 
+    def updateLabelImage(self, min, max):
+
+        if self.anchor is None:
+            self.updateImage()
+        else :
+            origin = self.getImage()
+            labeled = self.data_manager.labeSlice(origin, self.anchor.x, self.anchor.y, min, max)
+            self.image.draw(labeled)
+
     def clickme(self):
         self.image.setPixmap(QPixmap(r"E:\muse\models\truck.jpg"))
         self.button.setText("huy")
@@ -89,8 +109,12 @@ class SliceView(QWidget):
     def UiComponents(self):
         vbox = QVBoxLayout(self)
 
+        self.title = self._GetTitle()
         vbox.addWidget(QLabel(self.title))
+
+        self.image = Render2d.WindowX(self.getImage(), self.setNewAnchorPoint, self.resetAnchorPoint)
         vbox.addWidget(self.image)
+
         vbox.addWidget(self.slider)
 
         self.setLayout(vbox)
