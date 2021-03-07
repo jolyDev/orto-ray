@@ -11,6 +11,8 @@ from PIL import Image
 
 import Render2d
 
+from segmentation.image_operations import ImageMutator
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
@@ -54,13 +56,15 @@ class SliceView(QWidget):
         if self.view == View.PROFILE:
             return self.data_manager.getMaxZ()
 
-    def __init__(self, parent, view: View, data_manager):
-        super().__init__()
+    def __init__(self, parent, view: View, data_manager, hu_range):
+        super(QWidget, self).__init__(parent)
 
-        self.parent = parent
         self.view = view
+        self.image_data_operator = ImageMutator()
+        self.image_data_operator.getContour()
         self.data_manager = data_manager
-        self.slider = Slider(self, 0, self._GetSliderMax(), self.updateImage)
+        self.slider = Slider(self, 0, self._GetSliderMax(), self.update)
+        self.hu = hu_range
 
         self.UiComponents()
 
@@ -89,17 +93,14 @@ class SliceView(QWidget):
         if self.view == View.PROFILE:
             return self.data_manager.getSliceXY(index)
 
-    def updateImage(self):
-        self.image.draw(self.getImage())
-
-    def updateLabelImage(self, min, max):
-
+    def update(self):
         if self.anchor is None:
-            self.updateImage()
+            self.image.draw(self.getImage())
         else :
-            origin = self.getImage()
-            labeled = self.data_manager.labeSlice(origin, self.anchor.x, self.anchor.y, min, max)
-            self.image.draw(labeled)
+            self.image_data_operator.getContour()
+            self.image_data_operator.setImage(self.getImage())
+            self.image_data_operator.recalculateArea(self.anchor.x, self.anchor.y, self.hu.low(), self.hu.high())
+            self.image.draw(self.image_data_operator.getLabeled())
 
     def clickme(self):
         self.image.setPixmap(QPixmap(r"E:\muse\models\truck.jpg"))

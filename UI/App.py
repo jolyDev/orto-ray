@@ -5,7 +5,7 @@ from PyQt5.QtCore import *
 import pyvi
 
 from Slice import SliceView, View
-from RangeSlider import RangeSliderHU
+from Slider2 import RangeSliderHU
 from segmentation.segmentation_manager import SegmentationManager
 
 class Window(QWidget):
@@ -14,19 +14,20 @@ class Window(QWidget):
         super().__init__()
 
         self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/head")
-        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager)
-        self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager)
-        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager)
+        self.hu = RangeSliderHU("hu", 15, 35, 0, 255, self.update)
+        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager, self.hu)
+        self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager, self.hu)
+        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager, self.hu)
         #self.model = SliceView(self, "model", r'C:\athena.jpg')
         self.setWindowTitle("Ortho Ray")
         self.UiComponents()
 
         self.show()
 
-    def updateLabeling(self, min, max):
-        self.frontal_view.updateLabelImage(min, max)
-        self.profile_view.updateLabelImage(min, max)
-        self.horizontal_view.updateLabelImage(min, max)
+    def update(self):
+        self.frontal_view.update()
+        self.profile_view.update()
+        self.horizontal_view.update()
 
     def UiComponents(self):
         hbox = QHBoxLayout(self)
@@ -39,7 +40,7 @@ class Window(QWidget):
         grid.addWidget(self.frontal_view,1,1)
 
         hbox.addLayout(grid)
-        hbox.addWidget(RangeSliderHU("hu", 15, 35, 0, 255, self.updateLabeling))
+        hbox.addWidget(self.hu)
         self.showMaximized()
 
 if __name__ == '__main__':

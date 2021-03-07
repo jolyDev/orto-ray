@@ -259,7 +259,7 @@ class RangeSliderHU(QtWidgets.QWidget):
 
     def update(self, low, high):
         self.updateInfo(low, high)
-        self.callback(low, high)
+        self.callback()
 
     def updateInfo(self, low, high):
         self.label.setText(str(self.title) + " ({}, {})".format(high, low))

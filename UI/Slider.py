@@ -8,9 +8,8 @@ import sys
 class Slider(QWidget):
 
     def __init__(self, parent, min, max, callback):
-        super().__init__()
+        super(QWidget, self).__init__(parent)
 
-        self.parent = parent
         self.callback = callback
         self.index = min
 
