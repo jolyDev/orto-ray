@@ -40,13 +40,21 @@ class SliceView(QWidget):
         if self.view == View.HORIZONTAL:
             return "Horizontal"
 
+    def _GetSliderMax(self):
+        if self.view == View.FRONTAL:
+            return self.data_manager.getMaxX()
+        if self.view == View.HORIZONTAL:
+            return self.data_manager.getMaxY()
+        if self.view == View.PROFILE:
+            return self.data_manager.getMaxZ()
+
     def __init__(self, parent, view: View, data_manager):
         super().__init__()
 
         self.parent = parent
         self.view = view
         self.data_manager = data_manager
-        self.slider = Slider(self, 0, 100, self.updateImage)
+        self.slider = Slider(self, 0, self._GetSliderMax(), self.updateImage)
         self.title = self._GetTitle()
 
         self.image = renderer2.WindowX(self.getImage())
@@ -58,14 +66,16 @@ class SliceView(QWidget):
 
         # method for widgets
 
+    def rotate(self, image):
+        return np.rot90(image, 3)
+
     def getImage(self):
         index = self.slider.getIndex()
-        image = ""
         if self.view == View.FRONTAL:
-            return self.data_manager.getSliceYZ(index)
-        if self.view == View.PROFILE:
-            return self.data_manager.getSliceXZ(index)
+            return self.rotate(self.data_manager.getSliceYZ(index))
         if self.view == View.HORIZONTAL:
+            return self.rotate(self.data_manager.getSliceXZ(index))
+        if self.view == View.PROFILE:
             return self.data_manager.getSliceXY(index)
 
     def updateImage(self):

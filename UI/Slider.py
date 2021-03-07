@@ -17,7 +17,7 @@ class Slider(QWidget):
         hbox = QHBoxLayout()
 
         sld = QSlider(Qt.Horizontal, self)
-        sld.setRange(min, max)
+        sld.setRange(min, max - 1)
         sld.setFocusPolicy(Qt.NoFocus)
         sld.setPageStep(1)
 

@@ -26,10 +26,10 @@ class Window(QWidget):
     def UiComponents(self):
         grid = QGridLayout(self)
 
-        grid.addWidget(self.frontal_view,0,0)
+        grid.addWidget(self.horizontal_view,0,0)
         grid.addWidget(QWidget(),0,1)
         grid.addWidget(self.profile_view,1,0)
-        grid.addWidget(self.horizontal_view,1,1)
+        grid.addWidget(self.frontal_view,1,1)
 
         self.showMaximized()
 

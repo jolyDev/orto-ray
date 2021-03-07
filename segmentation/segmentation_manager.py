@@ -1,4 +1,5 @@
 import SimpleITK
+import matplotlib.pyplot as plt
 
 class SegmentationManager():
     def __init__(self, dicom_location):
@@ -10,6 +11,7 @@ class SegmentationManager():
         self.data = reader.Execute()
 
         self.label_id = 1
+        plt.set_cmap("gray")
 
     def getSliceYZ(self, index):
         return SimpleITK.GetArrayFromImage(self.data[index, :, :])
@@ -19,6 +21,15 @@ class SegmentationManager():
 
     def getSliceXY(self, index):
         return SimpleITK.GetArrayFromImage(self.data[:, :, index])
+
+    def getMaxX(self):
+        return SimpleITK.GetArrayFromImage(self.data).shape[2]
+
+    def getMaxY(self):
+        return SimpleITK.GetArrayFromImage(self.data).shape[1]
+
+    def getMaxZ(self):
+        return SimpleITK.GetArrayFromImage(self.data).shape[0]
 
 
     def labeSlice(self, slice_image, center_x: int, center_y: int, hu_min: int, hu_max: int):
