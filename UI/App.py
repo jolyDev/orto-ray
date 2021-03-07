@@ -5,7 +5,7 @@ from PyQt5.QtCore import *
 import pyvi
 
 from Slice import SliceView, View
-from RangeSlider import RangeSliderHU
+from Slider2 import RangeSliderHU
 from segmentation.segmentation_manager import SegmentationManager
 
 class Window(QWidget):
@@ -13,7 +13,7 @@ class Window(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/head")
+        self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/Jaw")
         self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager)
         self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager)
         self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager)

@@ -61,6 +61,7 @@ class SliceView(QWidget):
         self.view = view
         self.data_manager = data_manager
         self.slider = Slider(self, 0, self._GetSliderMax(), self.updateImage)
+        self.pixel_area = self.getPixelArea(self.data_manager.getDimetionsSize())
 
         self.UiComponents()
 
@@ -73,6 +74,14 @@ class SliceView(QWidget):
 
     def resetAnchorPoint(self, x, y):
         self.anchor = None
+
+    def getPixelArea(self, width):
+        if self.view == View.FRONTAL:
+            return width[1] * width[2]
+        if self.view == View.HORIZONTAL:
+            return width[0] * width[2]
+        if self.view == View.PROFILE:
+            return width[0] * width[1]
 
     def setNewAnchorPoint(self, x, y):
         self.anchor = Point(x, y)
@@ -98,13 +107,8 @@ class SliceView(QWidget):
             self.updateImage()
         else :
             origin = self.getImage()
-            labeled = self.data_manager.labeSlice(origin, self.anchor.x, self.anchor.y, min, max)
+            labeled = self.data_manager.labeSlice(origin, self.anchor.x, self.anchor.y, min, max, self.pixel_area)
             self.image.draw(labeled)
-
-    def clickme(self):
-        self.image.setPixmap(QPixmap(r"E:\muse\models\truck.jpg"))
-        self.button.setText("huy")
-        self.update()
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)
