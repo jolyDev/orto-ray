@@ -15,6 +15,9 @@ class SegmentationManager():
         self.label_id = 1
         plt.set_cmap("gray")
 
+    def getData(self):
+        return SimpleITK.GetArrayFromImage(self.data)
+
     def getSliceYZ(self, index):
         return SimpleITK.GetArrayFromImage(self.data[index, :, :])
 

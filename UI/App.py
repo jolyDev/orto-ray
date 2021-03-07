@@ -5,7 +5,7 @@ from PyQt5.QtCore import *
 import pyvi
 
 from Slice import SliceView, View
-from Slider2 import RangeSliderHU
+from hu_manager import HounsfieldUnitsManager
 from segmentation.segmentation_manager import SegmentationManager
 
 class Window(QWidget):
@@ -39,7 +39,7 @@ class Window(QWidget):
         grid.addWidget(self.frontal_view,1,1)
 
         hbox.addLayout(grid)
-        hbox.addWidget(RangeSliderHU("hu", 15, 35, 0, 255, self.updateLabeling))
+        hbox.addWidget(HounsfieldUnitsManager(self.updateLabeling))
         self.showMaximized()
 
 if __name__ == '__main__':
