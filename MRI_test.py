@@ -148,7 +148,7 @@ print("Shape after resampling\t" + str(imgs_after_resamp.shape))
 
 
 # 3D plotting
-def make_mesh(image, threshold=-300, step_size=1):
+def make_mesh(image, threshold=1, step_size=1):
 
     print("Transposing surface")
     p = image.transpose(2, 1, 0)
