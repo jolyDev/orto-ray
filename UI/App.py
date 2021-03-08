@@ -7,16 +7,24 @@ import pyvi
 from Slice import SliceView, View
 from hu_manager import HounsfieldUnitsManager
 from segmentation.segmentation_manager import SegmentationManager
+from MultiSelection.AnchorPoints import AnchorPointsManager
 
 class Window(QWidget):
 
     def __init__(self):
         super().__init__()
 
-        self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/Jaw")
-        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager)
-        self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager)
-        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager)
+        self.anchor_manager = AnchorPointsManager()
+
+        self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/head")
+        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager, self.anchor_manager.apply, self.anchor_manager.reset)
+        self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager, self.anchor_manager.apply, self.anchor_manager.reset)
+        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager, self.anchor_manager.apply, self.anchor_manager.reset)
+
+        self.anchor_manager.addListener(self.frontal_view)
+        self.anchor_manager.addListener(self.profile_view)
+        self.anchor_manager.addListener(self.horizontal_view)
+
         #self.model = SliceView(self, "model", r'C:\athena.jpg')
         self.setWindowTitle("Ortho Ray")
         self.UiComponents()
@@ -39,7 +47,7 @@ class Window(QWidget):
         grid.addWidget(self.frontal_view,1,1)
 
         hbox.addLayout(grid)
-        hbox.addWidget(HounsfieldUnitsManager(self.updateLabeling))
+        hbox.addWidget(HounsfieldUnitsManager(self.anchor_manager.onHU_BoundsChanged))
         self.showMaximized()
 
 if __name__ == '__main__':

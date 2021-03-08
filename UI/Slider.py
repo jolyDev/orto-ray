@@ -18,10 +18,13 @@ class Slider(QWidget):
 
         sld = QSlider(Qt.Horizontal, self)
         sld.setRange(min, max - 1)
+        sld.setValue(70)
         sld.setFocusPolicy(Qt.NoFocus)
         sld.setPageStep(1)
 
         sld.valueChanged.connect(self.onDataChanged)
+
+        self.value = sld
 
         self.label = QLabel(str(min), self)
         self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
