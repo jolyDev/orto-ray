@@ -10,11 +10,15 @@ from Slice import SliceView, View
 from hu_manager import HounsfieldUnitsManager
 from segmentation.segmentation_manager import SegmentationManager
 from segmentation.segmantate3D import segmentate3D
+from segmentation.segmantate3D import test
 from MultiSelection.AnchorPoints import AnchorPointsManager
 
 from segmentation.china import regionGrowing
 
+from Segmentation3D.RegionGrowth import RegionGrow3D
+
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from matplotlib.colors import LightSource
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
@@ -22,19 +26,6 @@ import scipy.ndimage
 from skimage import morphology
 from skimage import measure
 from skimage.morphology import square
-
-def plot_3d_data(data):
-    fig = plt.figure(figsize=(6,6))
-    ax = fig.add_subplot(111, projection='3d')
-
-    filtered = data > 42
-
-    if not len(data[filtered]):
-        return
-    # Plot a 3D surface
-    ax.plot_surface(data[:0], data[:1], data[:2])
-
-    plt.show()
 
 # 3D plotting
 def make_mesh(image, threshold=-300, step_size=1):
@@ -46,6 +37,10 @@ def make_mesh(image, threshold=-300, step_size=1):
     verts, faces, norm, val = measure.marching_cubes(p, threshold, step_size=step_size, allow_degenerate=True)
     # verts, faces = measure.marching_cubes(p, threshold)
     return verts, faces
+
+def normalize(arr):
+    arr_min = np.min(arr)
+    return (arr-arr_min)/(np.max(arr)-arr_min)
 
 class Window(QWidget):
 
@@ -76,6 +71,15 @@ class Window(QWidget):
         self.profile_view.updateLabelImage(min, max)
         self.horizontal_view.updateLabelImage(min, max)
 
+    def show_histogram(self, values):
+        n, bins, patches = plt.hist(values.reshape(-1), 50, density=True)
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+
+        for c, p in zip(normalize(bin_centers), patches):
+            plt.setp(p, 'facecolor', cm.viridis(c))
+
+        plt.show()
+
     def regenerate3d(self):
 
         x = self.frontal_view.slider.getIndex()
@@ -88,7 +92,6 @@ class Window(QWidget):
         max = self.hu_manager.slider.getMax()
         min = self.hu_manager.slider.getMin()
         sengmented_area = segmentate3D(data3d, seeds, max, min)
-        plot_3d_data(sengmented_area)
 
     def UiComponents(self):
         hbox = QHBoxLayout(self)

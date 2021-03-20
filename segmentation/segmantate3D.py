@@ -65,22 +65,24 @@ def test(data):
     plt.show()
 
 
-arr =  [[
-    [5,  5, 0],
-    [0,  5, 0],
-    [0,  0, 0]],
+if __name__ == '__main__':
 
-   [[0, 5, 0],
-    [5, 5, 5],
-    [0, 5, 0]],
+    arr =  [[
+        [5,  5, 0],
+        [0,  5, 0],
+        [0,  0, 0]],
 
-   [[0, 0, 0],
-    [0, 5, 0],
-    [0, 0, 0]]]
+       [[0, 5, 0],
+        [5, 5, 5],
+        [0, 5, 0]],
 
-num_arr = np.array(arr)
-test(num_arr)
+       [[0, 0, 0],
+        [0, 5, 0],
+        [0, 0, 0]]]
 
-segmented = segmentate3D(num_arr, [[1,1,1]], 6, 4)
+    num_arr = np.array(arr)
+    test(num_arr)
 
-test(segmented)
+    segmented = segmentate3D(num_arr, [[1,1,1]], 6, 4)
+
+    test(segmented)
