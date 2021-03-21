@@ -1,6 +1,9 @@
 import SimpleITK
 import matplotlib.pyplot as plt
 
+from common.ProjectionTypes import View
+from common.ProjectionTypes import viewToInt
+
 from Utilities import logger
 
 class SegmentationManager():
@@ -18,23 +21,18 @@ class SegmentationManager():
     def getData(self):
         return SimpleITK.GetArrayFromImage(self.data)
 
-    def getSliceYZ(self, index):
-        return SimpleITK.GetArrayFromImage(self.data[index, :, :])
+    def getSlice(self, index, view : View):
+        if view is View.FRONTAL:
+            return SimpleITK.GetArrayFromImage(self.data[index, :, :])
+        elif view is View.PROFILE:
+            return SimpleITK.GetArrayFromImage(self.data[:, index, :])
+        elif view is View.HORIZONTAL:
+            return SimpleITK.GetArrayFromImage(self.data[:, :, index])
+        else:
+            assert False
 
-    def getSliceXZ(self, index):
-        return SimpleITK.GetArrayFromImage(self.data[:, index, :])
-
-    def getSliceXY(self, index):
-        return SimpleITK.GetArrayFromImage(self.data[:, :, index])
-
-    def getMaxX(self):
-        return SimpleITK.GetArrayFromImage(self.data).shape[2]
-
-    def getMaxY(self):
-        return SimpleITK.GetArrayFromImage(self.data).shape[1]
-
-    def getMaxZ(self):
-        return SimpleITK.GetArrayFromImage(self.data).shape[0]
+    def getMax(self, view : View):
+        return SimpleITK.GetArrayFromImage(self.data).shape[2 - viewToInt(view)] # inverted
 
     def getArea(self):
         return self.area

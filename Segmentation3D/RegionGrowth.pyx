@@ -13,8 +13,11 @@ import numpy as np
 cimport numpy as np
 cimport cython
 
-def foo():
-    print("lol")
+def axis_log(point, data3d):
+    x = point[0][0]
+    y = point[0][1]
+    z = point[0][2]
+    print("[" + str(x) + ", " + str(y) + ", " + str(z) + "] | " + str(data3d[x][y][z]))
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -45,6 +48,8 @@ cdef class RegionGrow3D:
         """
         seed: list of (z,y,x)
         """
+        axis_log(seeds, self.images)
+
         cdef int newItem[3]
         for seed in seeds:
             newItem = seed

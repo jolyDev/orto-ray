@@ -69,7 +69,6 @@ class SliceView(QWidget):
         if not anchor:
             self.updateImage()
         else :
-            print("", anchor[0], anchor[0])
             origin = self.getImage()
             labeled = self.data_manager.labeSlice(origin, anchor[0], anchor[1], min, max, self.pixel_area)
             self.image.draw(labeled)
@@ -92,12 +91,10 @@ class SliceView(QWidget):
 
     def getImage(self):
         index = self.slider.getIndex()
-        if self.view == View.FRONTAL:
-            return self.rotate(self.data_manager.getSliceYZ(index))
-        if self.view == View.HORIZONTAL:
-            return self.rotate(self.data_manager.getSliceXZ(index))
+        if self.view == View.FRONTAL or self.view == View.HORIZONTAL:
+            return self.rotate(self.data_manager.getSlice(index, self.view))
         if self.view == View.PROFILE:
-            return self.data_manager.getSliceXY(index)
+            return self.data_manager.getSlice(index, self.view)
 
     def getPixelArea(self, width):
         if self.view == View.FRONTAL:
@@ -116,10 +113,5 @@ class SliceView(QWidget):
             return "Horizontal"
 
     def _GetSliderMax(self):
-        if self.view == View.FRONTAL:
-            return self.data_manager.getMaxX()
-        if self.view == View.HORIZONTAL:
-            return self.data_manager.getMaxY()
-        if self.view == View.PROFILE:
-            return self.data_manager.getMaxZ()
+        return self.data_manager.getMax(self.view)
 

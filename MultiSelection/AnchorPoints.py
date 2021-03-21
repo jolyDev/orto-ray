@@ -40,6 +40,9 @@ class AnchorPointsManager:
             if point_2d:
                 subscriber.updateLabelImage(point_2d, self.min, self.max)
 
+    def getCoord3D(self):
+        return self.anchors
+
     def get2dCoords(self, view: View):
         if not self.anchors:
             return []

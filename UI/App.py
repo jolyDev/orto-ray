@@ -5,6 +5,8 @@ from PyQt5.QtCore import *
 import pyvi
 import time
 import numpy as np
+import cortex
+import pyvista as pv
 
 from Slice import SliceView, View
 from hu_manager import HounsfieldUnitsManager
@@ -21,6 +23,7 @@ import Segmentation3D.test
 import faulthandler
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from mayavi import mlab
 from matplotlib.colors import LightSource
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
@@ -29,21 +32,17 @@ from skimage import morphology
 from skimage import measure
 from skimage.morphology import square
 
+
+def axis_log(point, data3d):
+    x = point[0][0]
+    y = point[0][1]
+    z = point[0][2]
+    print("[" + str(x) + ", " + str(y) + ", " + str(z) + "] | " + str(data3d[x][y][z]))
+
+
 def test(data):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    linear = data.reshape(-1)
-    # your real data here - some 3d boolean array
-    #x = linear[::3]
-    #y = linear[1::3]
-    #y = linear[1::3]
-    #z = np.indices((10, 10, 10))
-    #voxels = (x == y) | (y == z)
-
-    ax.voxels(data)
-
-    plt.show()
+    dataX = pv.wrap(data)
+    dataX.plot(volume=True) # Volume render
 
 # 3D plotting
 def make_mesh(image, threshold=-300, step_size=1):
@@ -99,24 +98,16 @@ class Window(QWidget):
         plt.show()
 
     def regenerate3d(self):
-
-        x = self.frontal_view.slider.getIndex()
-        y = self.profile_view.slider.getIndex()
-        z = self.horizontal_view.slider.getIndex()
-
         data3d = self.dicom_manager.getData()
-        seeds = self.anchor_manager.anchors
-        seeds = np.array([[x, y, z]], dtype=np.int64)
+        seeds = self.anchor_manager.getCoord3D()
+        seeds = np.array([[int(seeds[2]), int(seeds[1]), int(seeds[0])]], dtype=np.int64)
         max = self.hu_manager.slider.getMax()
         min = self.hu_manager.slider.getMin()
 
         adapted_array = np.array(self.dicom_manager.getData(), dtype=np.int64)
-        print("hello")
 
-        plt.hist(adapted_array.reshape(-1))
-        plt.title("histogram")
-        plt.show()
 
+        axis_log(seeds, data3d)
         start = time.time()
         var = Segmentation3D.RegionGrowth.RegionGrow3D(adapted_array, max, min, "6n")
 
@@ -125,7 +116,12 @@ class Window(QWidget):
         segmented = np.asarray(var.main(seeds))
         print(np.sum(segmented == 0))
         print(np.sum(True))
-        Mesh.saveToSTL.to_mesh(segmented, r"E:/orto-ray/Segmentation3D/km4.stl")
+        test(segmented)
+        #plt.hist(segmented.reshape(-1))
+        #plt.title("histogram")
+        #plt.show()
+
+        #Mesh.saveToSTL.to_mesh(segmented, r"E:/orto-ray/Segmentation3D/km4.stl")
         # v, f = make_mesh(segmented, 1, 0.1)
         # Mesh.saveToSTL.save_mesh(r"E:/orto-ray/Segmentation3D/km.stl", v, f)
 
