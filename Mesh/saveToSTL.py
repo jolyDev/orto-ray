@@ -1,5 +1,19 @@
 from stl import mesh
 import numpy as np
+from skimage import measure
+
+# 3D plotting
+def make_mesh(image, threshold=1, step_size=1):
+
+    print("Transposing surface")
+    p = image.transpose(2, 1, 0)
+
+    print("Calculating surface")
+    print(measure.marching_cubes(p, threshold))
+    verts, faces, norm, val = measure.marching_cubes(p, threshold, step_size=step_size, allow_degenerate=True)
+    #verts, faces = measure.marching_cubes(p, threshold)
+    return verts, faces
+
 
 def save_mesh(filename, vert, ind):
     if (len(vert) % 3) != 0:

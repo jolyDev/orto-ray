@@ -13,7 +13,7 @@ from skimage import measure
 from skimage.morphology import square
 from sklearn.cluster import KMeans
 from matplotlib.colors import LightSource
-from plotly.graph_objs import *
+
 # init_notebook_mode(connected=True)
 print("importing is finished successfully")
 
@@ -147,20 +147,7 @@ imgs_after_resamp, spacing = resample(imgs_to_process, patient, [1, 1, 1])
 print("Shape after resampling\t" + str(imgs_after_resamp.shape))
 
 
-# 3D plotting
-def make_mesh(image, threshold=1, step_size=1):
 
-    print("Transposing surface")
-    p = image.transpose(2, 1, 0)
-
-    print("Calculating surface")
-    print(measure.marching_cubes(p, threshold))
-    verts, faces, norm, val = measure.marching_cubes(p, threshold, step_size=step_size, allow_degenerate=True)
-    #verts, faces = measure.marching_cubes(p, threshold)
-    return verts, faces
-
-
-v, f = make_mesh(imgs_after_resamp, 350, 2)
 
 
 def plotly_3d(verts, faces):
@@ -215,7 +202,7 @@ def plt_3d(verts, faces):
 
 plt_3d(v, f)
 
-import saveToSTL
+from Mesh import saveToSTL
 
 saveToSTL._save_mesh(v, f, os.path.join(output_path, "demo.stl"))
 #save_mesh

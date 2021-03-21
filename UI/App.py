@@ -15,8 +15,10 @@ from MultiSelection.AnchorPoints import AnchorPointsManager
 
 from segmentation.china import regionGrowing
 
-from Segmentation3D.RegionGrowth import RegionGrow3D
-
+import Segmentation3D.RegionGrowth
+import Mesh.saveToSTL
+import Segmentation3D.test
+import faulthandler
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import LightSource
@@ -26,6 +28,22 @@ import scipy.ndimage
 from skimage import morphology
 from skimage import measure
 from skimage.morphology import square
+
+def test(data):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    linear = data.reshape(-1)
+    # your real data here - some 3d boolean array
+    #x = linear[::3]
+    #y = linear[1::3]
+    #y = linear[1::3]
+    #z = np.indices((10, 10, 10))
+    #voxels = (x == y) | (y == z)
+
+    ax.voxels(data)
+
+    plt.show()
 
 # 3D plotting
 def make_mesh(image, threshold=-300, step_size=1):
@@ -88,10 +106,18 @@ class Window(QWidget):
 
         data3d = self.dicom_manager.getData()
         seeds = self.anchor_manager.anchors
-        seeds = [[x, y, z]]
+        seeds = np.array([[x, y, z]], dtype=np.int64)
         max = self.hu_manager.slider.getMax()
         min = self.hu_manager.slider.getMin()
-        sengmented_area = segmentate3D(data3d, seeds, max, min)
+
+        adapted_array = np.array(self.dicom_manager.getData(), dtype=np.int64)
+
+        var = Segmentation3D.RegionGrowth.RegionGrow3D(adapted_array, max, min, "6n")
+
+        segmented = np.asarray(var.main(seeds))
+
+        v, f = make_mesh(segmented, max, min)
+        Mesh.saveToSTL.save_mesh(r"E:/orto-ray/Segmentation3D/km.stl", v, f)
 
     def UiComponents(self):
         hbox = QHBoxLayout(self)

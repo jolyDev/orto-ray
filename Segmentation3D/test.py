@@ -18,8 +18,7 @@ def test(data):
 
     plt.show()
 
-
-if __name__ == '__main__':
+def use():
 
     arr =  [[
         [5,  5, 0],
@@ -58,3 +57,6 @@ if __name__ == '__main__':
     segmented = np.asarray(var.main(index_array, False))
 
     test(segmented)
+
+if __name__ == '__main__':
+    use()
