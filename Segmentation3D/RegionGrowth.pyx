@@ -53,7 +53,6 @@ cdef class RegionGrow3D:
 
         while len(self.queue) != 0:
             newItem = self.queue.pop()
-            print(newItem)
             neighbors = self.getNeighbors(newItem)
             for neighbor in neighbors:
                 self.checkNeighbour(neighbor[0], neighbor[1], neighbor[2])
@@ -88,7 +87,6 @@ cdef class RegionGrow3D:
 
 
     cdef checkNeighbour(self, int z, int y, int x):
-        print(z)
         cdef int intensity
         if (x < self.sx and y < self.sy and z < self.sz 
             and x > -1 and y > -1 and z > -1):

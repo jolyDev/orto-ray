@@ -2,6 +2,10 @@ from stl import mesh
 import numpy as np
 from skimage import measure
 
+from voxelfuse.voxel_model import VoxelModel
+from voxelfuse.mesh import Mesh
+from voxelfuse.primitives import generateMaterials
+
 # 3D plotting
 def make_mesh(image, threshold=1, step_size=1):
 
@@ -46,3 +50,12 @@ def _save_mesh(vertices, faces, filename):
 
     # Write the mesh to file "cube.stl"
     cube.save(filename)
+
+def save_stl(mesh, filename):
+    #mesh.export(filename)
+    print("unimplemented")
+
+def to_mesh(voxels, filename):
+    model = VoxelModel(voxels, generateMaterials(4))  #4 is aluminium.
+    mesh2 = Mesh.fromVoxelModel(model)
+    mesh2.export(filename)

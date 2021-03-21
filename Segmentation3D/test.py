@@ -2,6 +2,8 @@ import RegionGrowth
 import matplotlib.pyplot as plt
 import numpy as np
 
+import Mesh.saveToSTL as mesh_manager
+
 def test(data):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -33,30 +35,22 @@ def use():
         [0, 5, 0],
         [0, 0, 0]]]
 
-    mask =  [[
-        [1,  1, 1],
-        [1,  1, 1],
-        [1,  1, 1]],
-
-       [[1, 1, 1],
-        [1, 1, 1],
-        [1, 1, 1]],
-
-       [[1, 1, 1],
-        [1, 1, 1],
-        [1, 1, 1]]]
-
     indexes = [[1,1,1]]
 
     num_arr = np.array(arr, dtype=np.int64)
-    mask_arr = np.array(mask, dtype=np.int64)
     index_array = np.array(indexes, dtype=np.int64)
 
-    var = RegionGrowth.RegionGrow3D(num_arr, mask_arr, 6, 4, "6n")
+    var = RegionGrowth.RegionGrow3D(num_arr, 6, 4, "6n")
 
-    segmented = np.asarray(var.main(index_array, False))
+    return np.asarray(var.main(index_array))
 
-    test(segmented)
+
+def test_stl_saving():
+    segmented = use()
+    mesh_manager.to_mesh(segmented, r"E:/orto-ray/Segmentation3D/km2.stl")
+    #mesh_manager.save_stl(mesh_manager)
 
 if __name__ == '__main__':
-    use()
+    #segmented = use()
+    #test(segmented)
+    test_stl_saving()

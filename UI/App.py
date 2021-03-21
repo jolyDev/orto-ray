@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import pyvi
-
+import time
 import numpy as np
 
 from Slice import SliceView, View
@@ -111,13 +111,23 @@ class Window(QWidget):
         min = self.hu_manager.slider.getMin()
 
         adapted_array = np.array(self.dicom_manager.getData(), dtype=np.int64)
+        print("hello")
 
+        plt.hist(adapted_array.reshape(-1))
+        plt.title("histogram")
+        plt.show()
+
+        start = time.time()
         var = Segmentation3D.RegionGrowth.RegionGrow3D(adapted_array, max, min, "6n")
 
+        end = time.time()
+        print(end - start)
         segmented = np.asarray(var.main(seeds))
-
-        v, f = make_mesh(segmented, max, min)
-        Mesh.saveToSTL.save_mesh(r"E:/orto-ray/Segmentation3D/km.stl", v, f)
+        print(np.sum(segmented == 0))
+        print(np.sum(True))
+        Mesh.saveToSTL.to_mesh(segmented, r"E:/orto-ray/Segmentation3D/km4.stl")
+        # v, f = make_mesh(segmented, 1, 0.1)
+        # Mesh.saveToSTL.save_mesh(r"E:/orto-ray/Segmentation3D/km.stl", v, f)
 
     def UiComponents(self):
         hbox = QHBoxLayout(self)
