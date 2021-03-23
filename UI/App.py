@@ -17,9 +17,8 @@ from MultiSelection.AnchorPoints import AnchorPointsManager
 
 from segmentation.china import regionGrowing
 
-import Segmentation3D.RegionGrowth
+import Segmentation3D.region_growth
 import Mesh.saveToSTL
-import Segmentation3D.test
 import faulthandler
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -42,7 +41,7 @@ def axis_log(point, data3d):
 
 def test(data):
     dataX = pv.wrap(data)
-    dataX.plot(volume=True) # Volume render
+    dataX.plot(volume=True, eye_dome_lighting=True, parallel_projection=True) # Volume render
 
 # 3D plotting
 def make_mesh(image, threshold=-300, step_size=1):
@@ -67,10 +66,11 @@ class Window(QWidget):
         self.anchor_manager = AnchorPointsManager()
 
         self.dicom_manager = SegmentationManager("E:/orto-ray/dicom_data/head")
+        #test(self.dicom_manager.getData())
         self.frontal_view = SliceView(self, View.FRONTAL, self.dicom_manager, self.anchor_manager.apply, self.anchor_manager.reset)
         self.profile_view = SliceView(self, View.PROFILE, self.dicom_manager, self.anchor_manager.apply, self.anchor_manager.reset)
         self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom_manager, self.anchor_manager.apply, self.anchor_manager.reset)
-
+        self.anchor_manager.add_data(self.dicom_manager.getData())
         self.anchor_manager.addListener(self.frontal_view)
         self.anchor_manager.addListener(self.profile_view)
         self.anchor_manager.addListener(self.horizontal_view)
@@ -100,20 +100,18 @@ class Window(QWidget):
     def regenerate3d(self):
         data3d = self.dicom_manager.getData()
         seeds = self.anchor_manager.getCoord3D()
-        seeds = np.array([[int(seeds[2]), int(seeds[1]), int(seeds[0])]], dtype=np.int64)
+        seeds = np.array([[int(seeds[0]), int(seeds[1]), int(seeds[2])]], dtype=np.int64)
         max = self.hu_manager.slider.getMax()
         min = self.hu_manager.slider.getMin()
 
         adapted_array = np.array(self.dicom_manager.getData(), dtype=np.int64)
 
-
-        axis_log(seeds, data3d)
         start = time.time()
-        var = Segmentation3D.RegionGrowth.RegionGrow3D(adapted_array, max, min, "6n")
-
         end = time.time()
+        Segmentation3D.region_growth.axis_log(seeds, data3d)
+        segmented = Segmentation3D.region_growth.segmentate3D(adapted_array, seeds, max, min)
+
         print(end - start)
-        segmented = np.asarray(var.main(seeds))
         print(np.sum(segmented == 0))
         print(np.sum(True))
         test(segmented)

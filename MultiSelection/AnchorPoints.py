@@ -17,6 +17,14 @@ class AnchorPointsManager:
     def reset(self):
         self.anchors = []
 
+
+    # profile -> y
+    # horizontal -> x
+    #frontal -> z
+
+    def add_data(self, data):
+        self.data = data
+
     def apply(self, slice, coord_1, coord_2):
         point_3d = []
 
@@ -28,6 +36,10 @@ class AnchorPointsManager:
         if slice.getView() == View.PROFILE:
             point_3d = [coord_1, coord_2, index]
 
+        print(point_3d)
+        print(self.data[0][1][2])
+        print([point_3d[0], point_3d[2], point_3d[1]])
+        print(self.data[0][2][1])
         self.anchors = point_3d
 
     def addListener(self, listener):
@@ -41,7 +53,8 @@ class AnchorPointsManager:
                 subscriber.updateLabelImage(point_2d, self.min, self.max)
 
     def getCoord3D(self):
-        return self.anchors
+        x = self.anchors
+        return x
 
     def get2dCoords(self, view: View):
         if not self.anchors:

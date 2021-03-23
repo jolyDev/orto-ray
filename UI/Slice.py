@@ -91,10 +91,7 @@ class SliceView(QWidget):
 
     def getImage(self):
         index = self.slider.getIndex()
-        if self.view == View.FRONTAL or self.view == View.HORIZONTAL:
-            return self.rotate(self.data_manager.getSlice(index, self.view))
-        if self.view == View.PROFILE:
-            return self.data_manager.getSlice(index, self.view)
+        return self.data_manager.getSlice(index, self.view)
 
     def getPixelArea(self, width):
         if self.view == View.FRONTAL:
