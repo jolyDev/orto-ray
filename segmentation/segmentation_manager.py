@@ -1,38 +1,14 @@
 import SimpleITK
 import matplotlib.pyplot as plt
 
-from common.ProjectionTypes import View
-from common.ProjectionTypes import viewToInt
-
-from Utilities import logger
-
 class SegmentationManager():
-    def __init__(self, dicom_location):
+    def __init__(self):
         super().__init__()
-
-        # init data
-        reader = SimpleITK.ImageSeriesReader()
-        reader.SetFileNames(reader.GetGDCMSeriesFileNames(dicom_location))
-        self.data = reader.Execute()
-
         self.label_id = 1
         plt.set_cmap("gray")
 
     def getData(self):
         return SimpleITK.GetArrayFromImage(self.data)
-
-    def getSlice(self, index, view : View):
-        if view is View.FRONTAL:
-            return SimpleITK.GetArrayFromImage(self.data[index, :, :])
-        elif view is View.PROFILE:
-            return SimpleITK.GetArrayFromImage(self.data[:, index, :])
-        elif view is View.HORIZONTAL:
-            return SimpleITK.GetArrayFromImage(self.data[:, :, index])
-        else:
-            assert False
-
-    def getMax(self, view : View):
-        return SimpleITK.GetArrayFromImage(self.data).shape[2 - viewToInt(view)] # inverted
 
     def getArea(self):
         return self.area

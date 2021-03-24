@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import Mesh.saveToSTL as mesh_manager
+import Core.saveToSTL as mesh_manager
 
 def test(data):
     fig = plt.figure()
