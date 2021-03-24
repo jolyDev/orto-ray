@@ -4,6 +4,8 @@ import numpy as np
 from Slider import Slider
 
 import Render2d
+from segmentation.segmentation_manager import *
+import Segmentation3D.region_growth
 
 from Core.projection import *
 
@@ -23,6 +25,10 @@ class Point():
         self.x = x
         self.y = y
 
+def toRaw(point):
+    raw = [[]]
+
+    return np.array([[int(point.x), int(point.y)]], dtype=np.int64)
 
 class SliceView(QWidget):
 
@@ -60,10 +66,12 @@ class SliceView(QWidget):
     def updateSegmentation(self, anchor, min, max):
         if not anchor:
             self.updateImage()
-        else :
-            origin = self.getImage()
-            labeled = self.dicom.labeSlice(origin, anchor[0], anchor[1], min, max, self.pixel_area)
-            self.image.draw(labeled)
+        elif False:
+            data = np.array(self.getImage(), dtype=np.int64)
+            anchor2 = toRaw(anchor[0].get2d(self.view))
+            mask = Segmentation3D.region_growth.segmentate2d(data, anchor2, int(max), int(min))
+            seg_man = SegmentationManager()
+            self.image.draw(mask)
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)

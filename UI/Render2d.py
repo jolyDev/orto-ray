@@ -28,7 +28,9 @@ class WindowX(QMainWindow):
         if not event.button == 1:
             self.reset()
         else:
-            self.apply(event.xdata, event.ydata)
+            # swap data because on image it`s interpretated as row and columns
+            # but client side treats it as x and y
+            self.apply(event.ydata, event.xdata)
 
     def draw(self, data):
         self.canvas.setNewData(data)

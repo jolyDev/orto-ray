@@ -1,4 +1,5 @@
 import Core.projection as core
+import numpy as np
 
 class AnchorPointsManager:
 
@@ -17,8 +18,15 @@ class AnchorPointsManager:
         self.anchors = []
 
     def apply(self, slice, coord_1, coord_2):
-        point2d = core.point_2d(slice.view, coord_1, coord_2)
+        data2d = slice.getImage()
+        print("2D view")
+        print("{} | {} :".format(coord_1, coord_2))
+        print(data2d.shape)
+        print(data2d[int(coord_1)][int(coord_2)])
+
+        point2d = core.point2d(coord_1, coord_2, slice.view)
         point3d = point2d.to3d(slice.slider.getIndex())
+        self.reset()
         self.anchors.append(point3d)
 
     def addListener(self, listener):
@@ -28,3 +36,4 @@ class AnchorPointsManager:
     def update(self):
         for subscriber in self.listeners:
             subscriber.updateSegmentation(self.anchors, self.min, self.max)
+

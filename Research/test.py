@@ -12,7 +12,7 @@ import numpy as np
 import scipy.ndimage
 import render3d
 
-path = "E:/orto-ray/dicom_data/head"
+path = "/dicom_data/head"
 
 
 render3d.volume(img3d)

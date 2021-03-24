@@ -24,6 +24,6 @@ class dicom_manager():
         # fill 3D array with the images from the files
         for i, s in enumerate(slices):
             img2d = s.pixel_array
-            self.data3d[:, :, i] = img2d
+            self.data3d[:, :, i] = np.array(img2d, dtype=np.int64)
 
         self.data3d = np.array(self.data3d, dtype=np.int64)

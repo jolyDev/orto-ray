@@ -5,7 +5,6 @@ class SegmentationManager():
     def __init__(self):
         super().__init__()
         self.label_id = 1
-        plt.set_cmap("gray")
 
     def getData(self):
         return SimpleITK.GetArrayFromImage(self.data)
@@ -25,6 +24,13 @@ class SegmentationManager():
         none_zero_pixels = numpy_array[newarr]
         self.area = len(none_zero_pixels) * single_pixel_area
         print(self.area)
+
+    def apply_mask(self, origin, mask):
+        origin_vtk = SimpleITK.GetImageFromArray(origin)
+        mask_vtk = SimpleITK.GetImageFromArray(mask)
+
+        mask_vtk_labeled = SimpleITK.Cast(SimpleITK.RescaleIntensity(mask_vtk), 1)
+        return SimpleITK.GetArrayFromImage(SimpleITK.LabelOverlay(mask_vtk_labeled, origin_vtk))
 
 
     def labeSlice(self, slice_image, center_x: int, center_y: int, hu_min: int, hu_max: int, single_pixel_area):

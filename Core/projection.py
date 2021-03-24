@@ -1,4 +1,5 @@
 from enum import Enum
+import numpy as np
 
 class View(Enum):
     FRONTAL    = 0 # x
@@ -30,11 +31,13 @@ class point2d():
 
     def to3d(self, index : int):
         if self.view == View.FRONTAL:
-            return [index, self.x, self.y]
+            return point3d(index, self.x, self.y)
         if self.view == View.PROFILE:
-            return [self.x, index, self.y]
+            return point3d(self.x, index, self.y)
         if self.view == View.HORIZONTAL:
-            return [self.x, self.y, index]
+            return point3d(self.x, self.y, index)
+
+        return [-1, -1, -1]
 
 class point3d():
     def __init__(self, x : int, y : int, z : int):
@@ -43,11 +46,11 @@ class point3d():
         self.z = z
 
     def get2d(self, view: View):
-        if self.view == View.FRONTAL:
+        if view == View.FRONTAL:
             return point2d(self.y, self.z, view)
-        if self.view == View.PROFILE:
+        if view == View.PROFILE:
             return point2d(self.x, self.z, view)
-        if self.view == View.HORIZONTAL:
+        if view == View.HORIZONTAL:
             return point2d(self.x, self.y, view)
 
 class plane():
@@ -65,3 +68,6 @@ def getSlice(data3d, index: int, view : View):
             return data3d[:, index, :]
         elif view is View.HORIZONTAL:
             return data3d[:, :, index]
+
+def toNumPy(data):
+    return np.array(data, dtype=np.int64)

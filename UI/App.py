@@ -37,8 +37,8 @@ class Window(QWidget):
 
         self.anchors = AnchorPointsManager()
 
-        self.dicom = dicom_manager("E:/orto-ray/dicom_data/Jaw")
-        #test(self.dicom_manager.getData())
+        self.dicom = dicom_manager("E:/orto-ray/dicom_data/head")
+
         self.frontal_view = SliceView(self, View.FRONTAL, self.dicom, self.anchors.apply, self.anchors.reset)
         self.profile_view = SliceView(self, View.PROFILE, self.dicom, self.anchors.apply, self.anchors.reset)
         self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom, self.anchors.apply, self.anchors.reset)
@@ -69,11 +69,15 @@ class Window(QWidget):
         plt.show()
 
     def regenerate3d(self):
+        print("2D view")
         seeds = self.anchors.anchors
-        seeds = np.array([[int(seeds[0]), int(seeds[1]), int(seeds[2])]], dtype=np.int64)
+        seeds = np.array([[int(seeds[0].x), int(seeds[0].y), int(seeds[0].z)]], dtype=np.int64)
         max = self.hu_manager.slider.getMax()
         min = self.hu_manager.slider.getMin()
 
+        print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
+
+        return
         start = time.time()
         segmented = Segmentation3D.region_growth.segmentate3D(self.dicom.data3d, seeds, max, min)
         end = time.time()
@@ -85,6 +89,7 @@ class Window(QWidget):
         render3d.volume(segmented)
 
     def UiComponents(self):
+        plt.set_cmap("gray")
         hbox = QHBoxLayout(self)
 
         grid = QGridLayout(self)
@@ -103,7 +108,6 @@ class Window(QWidget):
         self.showMaximized()
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     ex = Window()
     sys.exit(app.exec_())
