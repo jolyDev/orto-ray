@@ -66,12 +66,15 @@ class SliceView(QWidget):
     def updateSegmentation(self, anchor, min, max):
         if not anchor:
             self.updateImage()
-        elif False:
+        else:
             data = np.array(self.getImage(), dtype=np.int64)
             anchor2 = toRaw(anchor[0].get2d(self.view))
+
+            #print("{} | {} : {}".format(coord_1, coord_2, data2d[int(coord_1)][int(coord_2)]))
+
             mask = Segmentation3D.region_growth.segmentate2d(data, anchor2, int(max), int(min))
             seg_man = SegmentationManager()
-            self.image.draw(mask)
+            self.image.draw(seg_man.apply_mask(data, mask))
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)

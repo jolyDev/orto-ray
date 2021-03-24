@@ -77,7 +77,6 @@ class Window(QWidget):
 
         print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
 
-        return
         start = time.time()
         segmented = Segmentation3D.region_growth.segmentate3D(self.dicom.data3d, seeds, max, min)
         end = time.time()
