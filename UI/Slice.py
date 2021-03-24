@@ -1,19 +1,11 @@
-import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-import pyvi
 import numpy as np
 from Slider import Slider
-from PIL import Image
 
 import Render2d
 
-from common.ProjectionTypes import View
-
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-
+from Core.projection import *
 
 def array_to_qimage(im: np.ndarray, copy=False):
     gray_color_table = [qRgb(i, i, i) for i in range(256)]
@@ -34,14 +26,14 @@ class Point():
 
 class SliceView(QWidget):
 
-    def __init__(self, parent, view: View, data_manager, apply_callback, reset_callback):
+    def __init__(self, parent, view: View, dicom, apply_callback, reset_callback):
         super().__init__()
 
         self.parent = parent
         self.view = view
-        self.data_manager = data_manager
+        self.dicom = dicom
         self.slider = Slider(self, 0, self._GetSliderMax(), self.updateImage)
-        self.pixel_area = self.getPixelArea(self.data_manager.getDimetionsSize())
+        #self.pixel_area = self.getPixelArea(self.data_manager.getDimetionsSize())
 
         self.UiComponents()
 
@@ -65,20 +57,18 @@ class SliceView(QWidget):
     def updateImage(self):
         self.image.draw(self.getImage())
 
-    def updateLabelImage(self, anchor, min, max):
+    def updateSegmentation(self, anchor, min, max):
         if not anchor:
             self.updateImage()
         else :
-            print("", anchor[0], anchor[0])
             origin = self.getImage()
-            labeled = self.data_manager.labeSlice(origin, anchor[0], anchor[1], min, max, self.pixel_area)
+            labeled = self.dicom.labeSlice(origin, anchor[0], anchor[1], min, max, self.pixel_area)
             self.image.draw(labeled)
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)
 
-        self.title = self._GetTitle()
-        vbox.addWidget(QLabel(self.title))
+        vbox.addWidget(QLabel(view_to_str(self.view)))
 
         self.image = Render2d.WindowX(self.getImage(), self.setNewAnchorPoint, self.resetAnchorPoint)
         vbox.addWidget(self.image)
@@ -91,13 +81,7 @@ class SliceView(QWidget):
         return self.view
 
     def getImage(self):
-        index = self.slider.getIndex()
-        if self.view == View.FRONTAL:
-            return self.rotate(self.data_manager.getSliceYZ(index))
-        if self.view == View.HORIZONTAL:
-            return self.rotate(self.data_manager.getSliceXZ(index))
-        if self.view == View.PROFILE:
-            return self.data_manager.getSliceXY(index)
+        return getSlice(self.dicom.data3d, self.slider.getIndex(), self.view)
 
     def getPixelArea(self, width):
         if self.view == View.FRONTAL:
@@ -107,19 +91,6 @@ class SliceView(QWidget):
         if self.view == View.PROFILE:
             return width[0] * width[1]
 
-    def _GetTitle(self) -> str:
-        if self.view == View.FRONTAL:
-            return "Frontal"
-        if self.view == View.PROFILE:
-            return "Profile"
-        if self.view == View.HORIZONTAL:
-            return "Horizontal"
-
     def _GetSliderMax(self):
-        if self.view == View.FRONTAL:
-            return self.data_manager.getMaxX()
-        if self.view == View.HORIZONTAL:
-            return self.data_manager.getMaxY()
-        if self.view == View.PROFILE:
-            return self.data_manager.getMaxZ()
+        return getMax(self.dicom.data3d, self.view)
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env python2
 import numpy as np
-# import dicom
-import pydicom
-import pydicom.uid  # to use .pixle_array
+# import dicom  # to use .pixle_array
 import os
 import matplotlib.pyplot as plt
 from glob import glob
@@ -29,22 +27,6 @@ print ("Total of %d DICOM images.\nFirst 5 filenames:" % len(g))
 print('\n'.join(g[:5]))
 
 # Loop over the image files and store everything into a list.
-
-
-def load_scan(path):
-    slices = [pydicom.read_file(path + '/' + s) for s in os.listdir(path)]
-    slices.sort(key=lambda x: int(x.InstanceNumber))
-    try:
-        slice_thickness = np.abs(
-            slices[0].ImagePositionPatient[2] - slices[1].ImagePositionPatient[2])
-    except:
-        slice_thickness = np.abs(
-            slices[0].SliceLocation - slices[1].SliceLocation)
-
-    for s in slices:
-        s.SliceThickness = slice_thickness
-
-    return slices
 
 # Hounsfield scaling
 
@@ -202,7 +184,7 @@ def plt_3d(verts, faces):
 
 plt_3d(v, f)
 
-from Mesh import saveToSTL
+from Core import saveToSTL
 
 saveToSTL._save_mesh(v, f, os.path.join(output_path, "demo.stl"))
 #save_mesh
