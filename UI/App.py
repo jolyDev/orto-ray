@@ -88,7 +88,6 @@ class Window(QWidget):
         render3d.volume(segmented)
 
     def UiComponents(self):
-        plt.set_cmap("gray")
         hbox = QHBoxLayout(self)
 
         grid = QGridLayout(self)

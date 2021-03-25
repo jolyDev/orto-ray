@@ -30,7 +30,7 @@ class SegmentationManager():
         mask_vtk = SimpleITK.GetImageFromArray(mask)
 
         mask_vtk_labeled = SimpleITK.Cast(SimpleITK.RescaleIntensity(mask_vtk), 1)
-        return SimpleITK.GetArrayFromImage(SimpleITK.LabelOverlay(mask_vtk_labeled, origin_vtk))
+        return SimpleITK.GetArrayFromImage(SimpleITK.LabelOverlay(mask_vtk, origin_vtk))
 
 
     def labeSlice(self, slice_image, center_x: int, center_y: int, hu_min: int, hu_max: int, single_pixel_area):

@@ -33,8 +33,11 @@ class WindowX(QMainWindow):
             self.apply(event.ydata, event.xdata)
 
     def draw(self, data):
-        self.canvas.setNewData(data)
-        self.canvas.plot()
+        self.canvas.plotX(data, [])
+
+    def drawOverlayed(self, data, mask):
+        self.canvas.data = data
+        self.canvas.plotX(data, mask)
 
 class Canvas(FigureCanvas):
     def __init__(self, data ,parent=None, width=5, height=5, dpi=100):
@@ -44,6 +47,7 @@ class Canvas(FigureCanvas):
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
+        self.overlay = False
         self.plot()
 
     def plot(self):
@@ -54,5 +58,13 @@ class Canvas(FigureCanvas):
 
         self.draw()
 
-    def setNewData(self, data):
-        self.data = data
+    def plotX(self, data, mask):
+        self.axes.clear()
+
+        # plot data
+        self.axes.imshow(data)
+
+        if len(mask):
+            self.axes.imshow(mask, 'copper', alpha=0.5)
+
+        self.draw()
