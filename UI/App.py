@@ -11,7 +11,7 @@ from segmentation.segmantate3D import test
 from Core.anchor_points import AnchorPointsManager
 from Core.dicom_data_manager import dicom_manager
 
-import Segmentation3D.region_growth
+import Segmentation3D.regionGrowth2d
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
@@ -34,6 +34,7 @@ class Window(QWidget):
 
     def __init__(self):
         super().__init__()
+        plt.set_cmap("gray")
 
         self.anchors = AnchorPointsManager()
 

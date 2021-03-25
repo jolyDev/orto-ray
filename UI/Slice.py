@@ -3,9 +3,10 @@ from PyQt5.QtGui import *
 import numpy as np
 from Slider import Slider
 
+import time
 import Render2d
 from segmentation.segmentation_manager import *
-import Segmentation3D.region_growth
+import Segmentation3D.regionGrowth2d
 
 from Core.projection import *
 
@@ -68,15 +69,20 @@ class SliceView(QWidget):
         if not anchor:
             self.updateImage()
         else:
-            plt.set_cmap("gray")
             data = np.array(self.getImage(), dtype=np.int64)
             anchor2 = toRaw(anchor[0].get2d(self.view))
 
             #print("{} | {} : {}".format(coord_1, coord_2, data2d[int(coord_1)][int(coord_2)]))
 
-            mask = Segmentation3D.region_growth.segmentate2d(data, anchor2, int(max), int(min))
+            start = time.time()
+            mask = Segmentation3D.regionGrowth2d.segmentate2d(data, anchor2, int(max), int(min))
+            end = time.time()
 
             self.image.drawOverlayed(data, mask)
+            end2 = time.time()
+            print((end - start) / (end2 - end))
+
+
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)
