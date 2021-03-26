@@ -80,7 +80,10 @@ class Window(QWidget):
         #print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
 
         start = time.time()
-        segmented = Segmentation3D.regionGrowth3D.segmentate3D(self.dicom.data3d, seeds, max, min)
+        mask = Segmentation3D.regionGrowth3D.segmentate3D(self.dicom.data3d, seeds, max, min)
+        filter = mask == 0
+        segmented = self.dicom.data3d
+        segmented[filter] =0
         end = time.time()
 
         print(end - start)
