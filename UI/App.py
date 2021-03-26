@@ -11,7 +11,8 @@ from segmentation.segmantate3D import test
 from Core.anchor_points import AnchorPointsManager
 from Core.dicom_data_manager import dicom_manager
 
-import Segmentation3D.regionGrowth2d
+import Segmentation3D.regionGrowth2D
+import Segmentation3D.regionGrowth3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
@@ -76,18 +77,20 @@ class Window(QWidget):
         max = self.hu_manager.slider.getMax()
         min = self.hu_manager.slider.getMin()
 
-        print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
+        #print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
 
         start = time.time()
-        segmented = Segmentation3D.region_growth.segmentate3D(self.dicom.data3d, seeds, max, min)
+        segmented = Segmentation3D.regionGrowth3D.segmentate3D(self.dicom.data3d, seeds, max, min)
         end = time.time()
 
         print(end - start)
-        print(np.sum(segmented == 0))
-        print(np.sum(True))
-
         render3d.volume(segmented)
 
+        end2 = time.time()
+        print(end2 - end)
+        print("============================")
+        print(np.sum(True) / end - start)
+        print("============================")
     def UiComponents(self):
         hbox = QHBoxLayout(self)
 
