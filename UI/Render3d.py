@@ -1,68 +1,58 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtOpenGL import QGLWidget
 import sys
-import vtk
-from vtk import *
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+
+# Setting the Qt bindings for QtPy
+import os
+os.environ["QT_API"] = "pyqt5"
+
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMainWindow
+
+import numpy as np
+
+import pyvista as pv
+from pyvistaqt import QtInteractor
+
+class MainWindow(QMainWindow):
+
+    def __init__(self, parent=None, show=True):
+        QtWidgets.QMainWindow.__init__(self, parent)
+
+        # create the frame
+        self.frame = QtWidgets.QFrame()
+        vlayout = QtWidgets.QVBoxLayout()
+
+        # add the pyvista interactor object
+        self.plotter = QtInteractor(self.frame)
+        vlayout.addWidget(self.plotter.interactor)
+
+        self.frame.setLayout(vlayout)
+        self.setCentralWidget(self.frame)
+
+        # simple menu to demo functions
+        mainMenu = self.menuBar()
+        fileMenu = mainMenu.addMenu('File')
+        exitButton = QtWidgets.QAction('Exit', self)
+        exitButton.setShortcut('Ctrl+Q')
+        exitButton.triggered.connect(self.close)
+        fileMenu.addAction(exitButton)
+
+        # allow adding a sphere
+        meshMenu = mainMenu.addMenu('Mesh')
+        self.add_sphere_action = QtWidgets.QAction('Add Sphere', self)
+        self.add_sphere_action.triggered.connect(self.add_sphere)
+        meshMenu.addAction(self.add_sphere_action)
+
+        if show:
+            self.show()
+
+    def add_sphere(self):
+        """ add a sphere to the pyqt frame """
+        sphere = pv.Sphere()
+        self.plotter.add_mesh(sphere, show_edges=True)
+        self.plotter.reset_camera()
 
 
-class vtkMW(QMainWindow):
-    """docstring for Mainwindow"""
-
-    def __init__(self, parent=None):
-        super(vtkMW, self).__init__(parent)
-        self.basic()
-        vll = self.kuangti()
-        self.setCentralWidget(vll)
-
-    # Window Basic Properties
-    def basic(self):
-        # Set title, size, icon
-        self.setWindowTitle("GT1")
-        self.resize(1100, 650)
-        self.setWindowIcon(QIcon("./image/Gt1.png"))
-
-    def kuangti(self):
-        frame = QFrame()
-        vl = QVBoxLayout()
-        vtkWidget = QVTKRenderWindowInteractor()
-        vl.addWidget(vtkWidget)
-        # vl.setContentsMargins(0,0,0,0)
-        ren = vtk.vtkRenderer()
-        ren.SetBackground(0.01, 0.2, 0.01)
-        # renderer.GetActiveCamera().SetPosition() #Set the viewpoint position
-        # renderer.GetActiveCamera().SetViewUp(0, 1, 0) #Set the view direction
-        vtkWidget.GetRenderWindow().AddRenderer(ren)
-        self.iren = vtkWidget.GetRenderWindow().GetInteractor()
-        self.Creatobj(ren)
-        self.iren.Initialize()
-        frame.setLayout(vl)
-        return frame
-
-    def Creatobj(self, ren):
-        # Create source
-        filename = r"E:\muse\models\face.obj"
-        reader = vtk.vtkOBJReader()
-        reader.SetFileName(filename)
-        reader.Update()
-
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(reader.GetOutputPort())
-
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
-
-        ren.AddActor(actor)
-        ren.ResetCamera()
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    win = vtkMW()
-    win.show()
-    # win.iren.Initialize()
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
     sys.exit(app.exec_())
