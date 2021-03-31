@@ -15,6 +15,8 @@ import Segmentation3D.regionGrowth2D
 import Segmentation3D.regionGrowth3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import Render3d
+from Core.projection import getMax
 
 from skimage import measure
 
@@ -80,10 +82,18 @@ class Window(QWidget):
         #print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
 
         start = time.time()
+        print(self.dicom.data3d.shape[0])
+        print(self.dicom.data3d.shape[1])
+        print(self.dicom.data3d.shape[2])
+
+        print(getMax(self.dicom.data3d, View.FRONTAL))
+        print(getMax(self.dicom.data3d, View.PROFILE))
+        print(getMax(self.dicom.data3d, View.HORIZONTAL))
+
         mask = Segmentation3D.regionGrowth3D.segmentate3D(self.dicom.data3d, seeds, max, min)
         filter = mask == 0
-        segmented = self.dicom.data3d
-        segmented[filter] =0
+        segmented = np.copy(self.dicom.data3d)
+        segmented[filter] = 0
         end = time.time()
 
         print(end - start)
@@ -94,13 +104,14 @@ class Window(QWidget):
         print("============================")
         print(np.sum(True) / end - start)
         print("============================")
+
     def UiComponents(self):
         hbox = QHBoxLayout(self)
 
         grid = QGridLayout(self)
-
+        self.render_vidget = Render3d.RenderX(self.dicom.data3d)
         grid.addWidget(self.horizontal_view,0,0)
-        grid.addWidget(QWidget(),0,1)
+        grid.addWidget(self.render_vidget,0,1)
         grid.addWidget(self.profile_view,1,0)
         grid.addWidget(self.frontal_view,1,1)
 

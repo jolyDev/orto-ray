@@ -12,9 +12,10 @@ import numpy as np
 import pyvista as pv
 from pyvistaqt import QtInteractor
 
-class MainWindow(QMainWindow):
+import Style as styling
+class RenderX(QMainWindow):
 
-    def __init__(self, parent=None, show=True):
+    def __init__(self, data, parent=None, show=True):
         QtWidgets.QMainWindow.__init__(self, parent)
 
         # create the frame
@@ -28,19 +29,7 @@ class MainWindow(QMainWindow):
         self.frame.setLayout(vlayout)
         self.setCentralWidget(self.frame)
 
-        # simple menu to demo functions
-        mainMenu = self.menuBar()
-        fileMenu = mainMenu.addMenu('File')
-        exitButton = QtWidgets.QAction('Exit', self)
-        exitButton.setShortcut('Ctrl+Q')
-        exitButton.triggered.connect(self.close)
-        fileMenu.addAction(exitButton)
-
-        # allow adding a sphere
-        meshMenu = mainMenu.addMenu('Mesh')
-        self.add_sphere_action = QtWidgets.QAction('Add Sphere', self)
-        self.add_sphere_action.triggered.connect(self.add_sphere)
-        meshMenu.addAction(self.add_sphere_action)
+        self.plotter.add_volume(data, cmap=styling._COLOR_STYLE)
 
         if show:
             self.show()

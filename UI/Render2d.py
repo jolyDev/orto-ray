@@ -8,6 +8,7 @@ import pyvi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
+import Style as styling
 
 class WindowX(QMainWindow):
     def __init__(self, data, apply, reset):
@@ -65,6 +66,6 @@ class Canvas(FigureCanvas):
         self.axes.imshow(data)
 
         if len(mask):
-            self.axes.imshow(mask, 'copper', alpha=0.5)
+            self.axes.imshow(mask, styling._COLOR_STYLE, alpha=0.5)
 
         self.draw()
