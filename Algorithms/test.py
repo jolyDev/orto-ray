@@ -47,7 +47,7 @@ def use():
 
 def test_stl_saving():
     segmented = use()
-    mesh_manager.to_mesh(segmented, r"E:/orto-ray/Segmentation3D/km2.stl")
+    mesh_manager.to_mesh(segmented, r"/Algorithms/km2.stl")
     #mesh_manager.save_stl(mesh_manager)
 
 if __name__ == '__main__':

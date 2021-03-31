@@ -11,8 +11,8 @@ from segmentation.segmantate3D import test
 from Core.anchor_points import AnchorPointsManager
 from Core.DicomDataManager import DicomDataManager
 
-import Segmentation3D.regionGrowth2D
-import Segmentation3D.regionGrowth3D
+import Algorithms.regionGrowth2D
+import Algorithms.regionGrowth3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from DataView import DataView

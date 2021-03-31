@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from SliderX import SliderX
 from Core.Projection import View
-from Segmentation3D.regionGrowth3D import segmentate3D
+import Algorithms.Trim
+from Algorithms.regionGrowth3D import segmentate3D
 import time
 import numpy as np
 from Render3d import Render3D
@@ -34,29 +35,18 @@ class DataView(QWidget):
         #self.renderer.update(self._trimBounds(self.segmented))
         print(min, max)
 
-    def _trimBounds(self, data3d):
+    def update(self):
         x = self.profile_range
         y = self.vertical_range
         z = self.horizontal_range
 
-        trimmed_data = np.zeros((x.getMax() - x.getMin(), y.getMax() - y.getMin(), z.getMax() - z.getMin()))
-        trimmed_data = np.array(trimmed_data, dtype=np.int64)
-
-        for i in range(x.getMin(), x.getMax()):
-            for j in range(y.getMin(), y.getMax()):
-                for k in range(z.getMin(), z.getMax()):
-                    shifted_i = i - x.getMin()
-                    shifted_j = j - y.getMin()
-                    shifted_k = k - z.getMin()
-                    trimmed_data[0]
-                    trimmed_data[0][1]
-                    trimmed_data[0][1][2]
-                    trimmed_data[shifted_i, shifted_j, shifted_k] = data3d[i, j, k]
-
-        return np.array(trimmed_data, dtype=np.int64)
-
-    def update(self):
-        self.scene.update(self._trimBounds(self.data3d.get()))
+        x_min = x.getMax()
+        x_max = y.getMin()
+        y_min = x.getMin()
+        y_max = y.getMax()
+        z_min = x.getMin()
+        z_max = y.getMax()
+        self.scene.update(Algorithms.Trim.Trim(self.data3d.get(), x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin()))
 
     def regenerate3d(self):
         start = time.time()

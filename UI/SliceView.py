@@ -6,7 +6,7 @@ from Slider import Slider
 import time
 import Render2d
 from segmentation.segmentation_manager import *
-import Segmentation3D.regionGrowth2D
+import Algorithms.regionGrowth2D
 
 from Core.Projection import *
 
@@ -75,7 +75,7 @@ class SliceView(QWidget):
             #print("{} | {} : {}".format(coord_1, coord_2, data2d[int(coord_1)][int(coord_2)]))
 
             start = time.time()
-            mask = Segmentation3D.regionGrowth2D.segmentate2d(data, anchor2, int(max), int(min))
+            mask = Algorithms.regionGrowth2D.segmentate2d(data, anchor2, int(max), int(min))
             end = time.time()
 
             self.image.drawOverlayed(data, mask)
