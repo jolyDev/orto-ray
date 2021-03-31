@@ -6,6 +6,14 @@ import scipy.ndimage
 from Core.Projection import View
 from Core.Projection import view_to_int
 
+def getSlice(data, index: int, view: View):
+    if view is View.FRONTAL:
+        return data[index, :, :]
+    elif view is View.PROFILE:
+        return data[:, index, :]
+    elif view is View.HORIZONTAL:
+        return data[:, :, index]
+
 class DicomDataManager():
     def __init__(self, dicom_rooth_path):
         self.listeners = []
@@ -23,12 +31,7 @@ class DicomDataManager():
         return self.origin.shape[view_to_int(view)]
 
     def getSlice(self, index: int, view: View):
-        if view is View.FRONTAL:
-            return self.origin[index, :, :]
-        elif view is View.PROFILE:
-            return self.origin[:, index, :]
-        elif view is View.HORIZONTAL:
-            return self.origin[:, :, index]
+        return getSlice(self.origin, index, view)
 
     def get(self):
         return self.origin

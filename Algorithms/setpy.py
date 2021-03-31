@@ -10,7 +10,7 @@ import numpy
 "cython -a Trim.pyx"
 
 setup(
-    ext_modules = cythonize(["regionGrowth2D.pyx", "regionGrowth3D.pyx", "Trim.pyx"],
+    ext_modules = cythonize(["regionGrowth2D.pyx", "regionGrowth3D.pyx", "Trim.pyx", "regionGrowthPlanes.pyx"],
                             compiler_directives={'language_level': "3"}),
     include_dirs = [numpy.get_include()]
 )

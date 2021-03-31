@@ -53,7 +53,7 @@ class HounsfieldUnitsManager(QWidget):
         max = self.slider.getMax()
         self.upper.setText(str(max))
         self.lower.setText(str(min))
-        self.callback(min, max)
+        self.callback()
 
     def boundsChanged(self, value):
         self.slider.setMinBound(int(self.min.value()))

@@ -20,74 +20,40 @@ def array_to_qimage(im: np.ndarray, copy=False):
 def array_to_pixmap(im):
     return QPixmap(array_to_qimage(im))
 
-
-class Point():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-def toRaw(point):
-    raw = [[]]
-
-    return np.array([[int(point.x), int(point.y)]], dtype=np.int64)
-
 class SliceView(QWidget):
 
-    def __init__(self, parent, view: View, dicom, apply_callback, reset_callback):
+    def __init__(self, parent, view: View, dicom, apply_callback, reset_callback, segmentation2d_callback):
         super().__init__()
 
         plt.set_cmap("gray")
         self.parent = parent
         self.view = view
         self.dicom = dicom
-        self.slider = Slider(self, 0, self._GetSliderMax(), self.updateImage)
+        self.slider = Slider(self, 0, self._GetSliderMax(), segmentation2d_callback)
+        self.anchor_apply = apply_callback
+        self.image = Render2d.Render2D(self.getImage(), self.apply, reset_callback)
         #self.pixel_area = self.getPixelArea(self.data_manager.getDimetionsSize())
 
         self.UiComponents()
-
-        self.apply = apply_callback
-        self.reset = reset_callback
-
-        # showing all the widgets
         self.show()
 
-        # method for widgets
-
-    def resetAnchorPoint(self):
-        self.reset()
-
-    def setNewAnchorPoint(self, x, y):
-        self.apply(self, x, y)
+    def apply(self, x, y):
+        self.anchor_apply(self, x, y)
 
     def rotate(self, image):
         return np.rot90(image, 3)
 
-    def updateImage(self):
+    def resetImage(self):
         self.image.draw(self.getImage())
 
-    def updateSegmentation(self, anchor, min, max):
-        if not anchor:
-            self.updateImage()
-        else:
-            data = np.array(self.getImage(), dtype=np.int64)
-            anchor2 = toRaw(anchor[0].get2d(self.view))
-
-            #print("{} | {} : {}".format(coord_1, coord_2, data2d[int(coord_1)][int(coord_2)]))
-
-            start = time.time()
-            mask = Algorithms.regionGrowth2D.segmentate2d(data, anchor2, int(max), int(min))
-            end = time.time()
-
-            self.image.drawOverlayed(data, mask)
-            end2 = time.time()
-            print((end - start) / (end2 - end))
+    def overlay(self, mask):
+        self.image.drawOverlayed(self.getImage(), mask)
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)
 
         vbox.addWidget(QLabel(view_to_str(self.view)))
 
-        self.image = Render2d.WindowX(self.getImage(), self.setNewAnchorPoint, self.resetAnchorPoint)
         vbox.addWidget(self.image)
 
         vbox.addWidget(self.slider)

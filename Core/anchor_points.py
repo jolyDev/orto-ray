@@ -1,46 +1,42 @@
 import Core.Projection as core
 import numpy as np
 
+def getRaw2D(points, view):
+    points2d = []
+    for el in points:
+        points2d.append(el.get2d(view))
+
+    raw = []
+    for el in points2d:
+        raw.append([el.x, el.y])
+
+    return np.array(raw, dtype=np.int64)
+
 class AnchorPointsManager:
 
-    def __init__(self):
+    def __init__(self, callback):
         self.anchors = []
-        self.listeners = []
-        self.min = 0
-        self.max = 1
-
-    def on_hu_bounds_changed(self, min: int, max: int):
-        self.min = min
-        self.max = max
-        self.update()
+        self.callback = callback
 
     def reset(self):
         self.anchors = []
+        self.callback()
 
     def apply(self, slice, coord_1, coord_2):
-        data2d = slice.getImage()
-        print("2D view")
-        print("{} | {} :".format(coord_1, coord_2))
-        print(data2d.shape)
-        print(data2d[int(coord_1)][int(coord_2)])
-
         point2d = core.point2d(coord_1, coord_2, slice.view)
         point3d = point2d.to3d(slice.slider.getIndex())
         self.reset()
         self.anchors.append(point3d)
+        self.callback()
 
-    def get(self):
+    def getRaw3D(self):
         raw = []
         for el in self.anchors:
             raw.append([el.x, el.y, el.z])
 
         return np.array(raw, dtype=np.int64)
 
-    def addListener(self, listener):
-        listener.slider.value.valueChanged.connect(self.update)
-        self.listeners.append(listener)
+    def getRaw2D(self, view):
+        return getRaw2D(self.anchors, view)
 
-    def update(self):
-        for subscriber in self.listeners:
-            subscriber.updateSegmentation(self.anchors, self.min, self.max)
 

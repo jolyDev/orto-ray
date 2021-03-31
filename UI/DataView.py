@@ -35,7 +35,7 @@ class DataView(QWidget):
         #self.renderer.update(self._trimBounds(self.segmented))
         print(min, max)
 
-    def update(self):
+    def _trimBounds(self):
         x = self.profile_range
         y = self.vertical_range
         z = self.horizontal_range
@@ -46,20 +46,27 @@ class DataView(QWidget):
         y_max = y.getMax()
         z_min = x.getMin()
         z_max = y.getMax()
-        self.scene.update(Algorithms.Trim.Trim(self.data3d.get(), x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin()))
+
+        return Algorithms.Trim.Trim(self.data3d.get(), x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin())
+
+    def update(self):
+        self.scene.update(self._trimBounds())
 
     def regenerate3d(self):
         start = time.time()
-        data3d = self._trimBounds(self.data3d.get())
+        data3d = self._trimBounds()
 
-        mask = segmentate3D(data3d, self.anchors.get(), self.hu.slider.getMax(), self.hu.slider.getMin())
+        mask = segmentate3D(data3d, self.anchors.getRaw3D(), self.hu.slider.getMax(), self.hu.slider.getMin())
         filter_condition = mask == 0
         segmented = np.copy(data3d)
         segmented[filter_condition] = 0
 
         end = time.time()
         print(end - start)
-        self.scene.update(segmented)
+        if np.count_nonzero(segmented) == 0:
+            self.scene.update(np.array([[[0]]], dtype=np.int64))
+        else:
+            self.scene.update(segmented)
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)

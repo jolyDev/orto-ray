@@ -12,13 +12,13 @@ class Slider(QWidget):
 
         self.parent = parent
         self.callback = callback
-        self.index = min
+        self.index = int((max - min ) / 2)
 
         hbox = QHBoxLayout()
 
         sld = QSlider(Qt.Horizontal, self)
         sld.setRange(min, max - 1)
-        sld.setValue(70)
+        sld.setValue(self.index)
         sld.setFocusPolicy(Qt.NoFocus)
         sld.setPageStep(1)
 
@@ -29,6 +29,7 @@ class Slider(QWidget):
         self.label = QLabel(str(min), self)
         self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         self.label.setMinimumWidth(80)
+        self.label.setText(str(self.index))
 
         hbox.addWidget(sld)
         hbox.addSpacing(15)

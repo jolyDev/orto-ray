@@ -10,6 +10,9 @@ from segmentation.segmentation_manager import SegmentationManager
 from segmentation.segmantate3D import test
 from Core.anchor_points import AnchorPointsManager
 from Core.DicomDataManager import DicomDataManager
+from Core.Segmentation2DManager import Segmentation2DManager
+from Slider import Slider
+from Render2d import Render2D
 
 import Algorithms.regionGrowth2D
 import Algorithms.regionGrowth3D
@@ -38,21 +41,24 @@ class Window(QWidget):
         super().__init__()
         plt.set_cmap("gray")
 
-        self.anchors = AnchorPointsManager()
-        self.hu_manager = HounsfieldUnitsManager(self.anchors.on_hu_bounds_changed)
+        self.segmentation2d = Segmentation2DManager()
+
         self.dicom = DicomDataManager("E:/orto-ray/dicom_data/head")
+        self.hu_manager = HounsfieldUnitsManager(self.segmentation2d.update)
+        self.anchors = AnchorPointsManager(self.segmentation2d.update)
         self.render_widget = DataView(self.dicom, self.anchors, self.hu_manager)
 
-        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom, self.anchors.apply, self.anchors.reset)
-        self.profile_view = SliceView(self, View.PROFILE, self.dicom, self.anchors.apply, self.anchors.reset)
-        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom, self.anchors.apply, self.anchors.reset)
+        self.frontal_view = SliceView(self, View.FRONTAL, self.dicom, self.anchors.apply, self.anchors.reset, self.segmentation2d.update)
+        self.profile_view = SliceView(self, View.PROFILE, self.dicom, self.anchors.apply, self.anchors.reset, self.segmentation2d.update)
+        self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom, self.anchors.apply, self.anchors.reset, self.segmentation2d.update)
 
-        self.anchors.addListener(self.frontal_view)
-        self.anchors.addListener(self.profile_view)
-        self.anchors.addListener(self.horizontal_view)
-
+        self.segmentation2d.post_init(self.dicom, self.anchors, self.hu_manager,
+                                      self.frontal_view,
+                                      self.profile_view,
+                                      self.horizontal_view)
         self.UiComponents()
         self.show()
+        self.segmentation2d.update()
 
     def updateLabeling(self, min, max):
         self.frontal_view.updateLabelImage(min, max)

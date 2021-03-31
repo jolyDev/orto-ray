@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import Style as styling
 
-class WindowX(QMainWindow):
+class Render2D(QMainWindow):
     def __init__(self, data, apply, reset):
         super().__init__()
 
@@ -41,7 +41,7 @@ class WindowX(QMainWindow):
         self.canvas.plotX(data, mask)
 
 class Canvas(FigureCanvas):
-    def __init__(self, data ,parent=None, width=5, height=5, dpi=100):
+    def __init__(self, data, parent=None, width=5, height=5, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         self.data = data

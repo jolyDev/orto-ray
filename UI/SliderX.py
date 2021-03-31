@@ -273,7 +273,6 @@ class SliderX(QtWidgets.QWidget):
 
     def setUpSlider(self, min, max, horizontal=True):
         slider = RangeSlider(QtCore.Qt.Horizontal if horizontal else QtCore.Qt.Vertical)
-        slider.setMinimumHeight(30)
         slider.setMinimum(min)
         slider.setMaximum(max)
         slider.setLow(min)
