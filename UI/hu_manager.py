@@ -2,7 +2,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 
-from Slider2 import RangeSliderHU
+from SliderX import SliderX
 
 
 class HounsfieldUnitsManager(QWidget):
@@ -25,7 +25,9 @@ class HounsfieldUnitsManager(QWidget):
         hbox_max.addWidget(self.max)
         vbox.addLayout(hbox_max)
 
-        self.slider = RangeSliderHU(- default / 4, default / 4, -default, default, self.dataChanged)
+        self.slider = SliderX(-default, default, self.dataChanged, False)
+        self.slider.slider.setLow(- default / 4)
+        self.slider.slider.setHigh( default / 4)
 
         self.upper = QLabel(str(self.slider.getMax()))
         vbox.addWidget(self.upper)

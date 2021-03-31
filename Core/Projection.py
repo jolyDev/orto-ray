@@ -58,16 +58,5 @@ class plane():
         self.data2d = data2d
         self.view = view
 
-def getMax(data3d, view : View):
-    return data3d.shape[view_to_int(view)]
-
-def getSlice(data3d, index: int, view : View):
-        if view is View.FRONTAL:
-            return data3d[index, :, :]
-        elif view is View.PROFILE:
-            return data3d[:, index, :]
-        elif view is View.HORIZONTAL:
-            return data3d[:, :, index]
-
 def toNumPy(data):
     return np.array(data, dtype=np.int64)

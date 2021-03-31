@@ -242,11 +242,11 @@ class RangeSlider(QtWidgets.QSlider):
                                              pos - slider_min, slider_max - slider_min,
                                              opt.upsideDown)
 
-class RangeSliderHU(QtWidgets.QWidget):
+class SliderX(QtWidgets.QWidget):
 
-    def __init__(self, low, high, min, max, callback):
-        super(RangeSliderHU, self).__init__()
-        self.slider = self.initSlider(low, high, min, max)
+    def __init__(self, min, max, callback, horizontal=True):
+        super(SliderX, self).__init__()
+        self.slider = self.setUpSlider(min, max, horizontal)
         self.callback = callback
 
         vbox = QVBoxLayout(self)
@@ -256,10 +256,10 @@ class RangeSliderHU(QtWidgets.QWidget):
         self.slider.sliderMoved.connect(callback)
 
     def getMin(self):
-        return self.slider.low()
+        return int(self.slider.low())
 
     def getMax(self):
-        return self.slider.high()
+        return int(self.slider.high())
 
     def setMinBound(self, min):
         if min > self.slider.low():
@@ -271,12 +271,12 @@ class RangeSliderHU(QtWidgets.QWidget):
             self.slider.setHigh(max)
         self.slider.setMaximum(max)
 
-    def initSlider(self, low, high, min, max):
-        slider = RangeSlider(QtCore.Qt.Vertical)
+    def setUpSlider(self, min, max, horizontal=True):
+        slider = RangeSlider(QtCore.Qt.Horizontal if horizontal else QtCore.Qt.Vertical)
         slider.setMinimumHeight(30)
         slider.setMinimum(min)
         slider.setMaximum(max)
-        slider.setLow(low)
-        slider.setHigh(high)
+        slider.setLow(min)
+        slider.setHigh(max)
         slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         return slider

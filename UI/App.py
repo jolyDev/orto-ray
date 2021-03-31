@@ -4,22 +4,21 @@ import time
 import numpy as np
 import pyvista as pv
 
-from Slice import SliceView, View
+from SliceView import SliceView, View
 from hu_manager import HounsfieldUnitsManager
 from segmentation.segmentation_manager import SegmentationManager
 from segmentation.segmantate3D import test
 from Core.anchor_points import AnchorPointsManager
-from Core.dicom_data_manager import dicom_manager
+from Core.DicomDataManager import DicomDataManager
 
 import Segmentation3D.regionGrowth2D
 import Segmentation3D.regionGrowth3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from DataView import DataView
 import Render3d
-from Core.projection import getMax
 
 from skimage import measure
-
 
 import Core.render3d as render3d
 
@@ -40,8 +39,9 @@ class Window(QWidget):
         plt.set_cmap("gray")
 
         self.anchors = AnchorPointsManager()
-
-        self.dicom = dicom_manager("E:/orto-ray/dicom_data/head")
+        self.hu_manager = HounsfieldUnitsManager(self.anchors.on_hu_bounds_changed)
+        self.dicom = DicomDataManager("E:/orto-ray/dicom_data/head")
+        self.render_widget = DataView(self.dicom, self.anchors, self.hu_manager)
 
         self.frontal_view = SliceView(self, View.FRONTAL, self.dicom, self.anchors.apply, self.anchors.reset)
         self.profile_view = SliceView(self, View.PROFILE, self.dicom, self.anchors.apply, self.anchors.reset)
@@ -51,11 +51,7 @@ class Window(QWidget):
         self.anchors.addListener(self.profile_view)
         self.anchors.addListener(self.horizontal_view)
 
-        self.hu_manager = HounsfieldUnitsManager(self.anchors.on_hu_bounds_changed)
-
-        self.setWindowTitle("Ortho Ray")
         self.UiComponents()
-
         self.show()
 
     def updateLabeling(self, min, max):
@@ -72,53 +68,23 @@ class Window(QWidget):
 
         plt.show()
 
-    def regenerate3d(self):
-        print("2D view")
-        seeds = self.anchors.anchors
-        seeds = np.array([[int(seeds[0].x), int(seeds[0].y), int(seeds[0].z)]], dtype=np.int64)
-        max = self.hu_manager.slider.getMax()
-        min = self.hu_manager.slider.getMin()
-
-        #print("{} | {} | {} : {}".format(seeds[0][0], seeds[0][1], seeds[0][2], self.dicom.data3d[seeds[0][0]][seeds[0][1]][seeds[0][2]]))
-
-        start = time.time()
-        print(self.dicom.data3d.shape[0])
-        print(self.dicom.data3d.shape[1])
-        print(self.dicom.data3d.shape[2])
-
-        print(getMax(self.dicom.data3d, View.FRONTAL))
-        print(getMax(self.dicom.data3d, View.PROFILE))
-        print(getMax(self.dicom.data3d, View.HORIZONTAL))
-
-        mask = Segmentation3D.regionGrowth3D.segmentate3D(self.dicom.data3d, seeds, max, min)
-        filter = mask == 0
-        segmented = np.copy(self.dicom.data3d)
-        segmented[filter] = 0
-        end = time.time()
-
-        print(end - start)
-        render3d.volume(segmented)
-
-        end2 = time.time()
-        print(end2 - end)
-        print("============================")
-        print(np.sum(True) / end - start)
-        print("============================")
-
     def UiComponents(self):
+        self.setWindowTitle("Ortho Ray")
+
         hbox = QHBoxLayout(self)
 
         grid = QGridLayout(self)
-        self.render_vidget = Render3d.RenderX(self.dicom.data3d)
+
         grid.addWidget(self.horizontal_view,0,0)
-        grid.addWidget(self.render_vidget,0,1)
         grid.addWidget(self.profile_view,1,0)
         grid.addWidget(self.frontal_view,1,1)
 
-        button = QPushButton('regenerate 3d')
-        button.clicked.connect(self.regenerate3d)
-        grid.addWidget(button,0,2)
+        grid.setColumnStretch(0, 1)
+        grid.setColumnStretch(1, 1)
+        grid.setRowStretch(0, 1)
+        grid.setRowStretch(1, 1)
 
+        hbox.addWidget(self.render_widget)
         hbox.addLayout(grid)
         hbox.addWidget(self.hu_manager)
         self.showMaximized()

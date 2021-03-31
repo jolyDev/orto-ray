@@ -8,7 +8,7 @@ import Render2d
 from segmentation.segmentation_manager import *
 import Segmentation3D.regionGrowth2D
 
-from Core.projection import *
+from Core.Projection import *
 
 def array_to_qimage(im: np.ndarray, copy=False):
     gray_color_table = [qRgb(i, i, i) for i in range(256)]
@@ -82,8 +82,6 @@ class SliceView(QWidget):
             end2 = time.time()
             print((end - start) / (end2 - end))
 
-
-
     def UiComponents(self):
         vbox = QVBoxLayout(self)
 
@@ -100,7 +98,7 @@ class SliceView(QWidget):
         return self.view
 
     def getImage(self):
-        return getSlice(self.dicom.data3d, self.slider.getIndex(), self.view)
+        return self.dicom.getSlice(self.slider.getIndex(), self.view)
 
     def getPixelArea(self, width):
         if self.view == View.FRONTAL:
@@ -111,5 +109,5 @@ class SliceView(QWidget):
             return width[0] * width[1]
 
     def _GetSliderMax(self):
-        return getMax(self.dicom.data3d, self.view)
+        return self.dicom.getMax(self.view)
 

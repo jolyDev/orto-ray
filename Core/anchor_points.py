@@ -1,4 +1,4 @@
-import Core.projection as core
+import Core.Projection as core
 import numpy as np
 
 class AnchorPointsManager:
@@ -28,6 +28,13 @@ class AnchorPointsManager:
         point3d = point2d.to3d(slice.slider.getIndex())
         self.reset()
         self.anchors.append(point3d)
+
+    def get(self):
+        raw = []
+        for el in self.anchors:
+            raw.append([el.x, el.y, el.z])
+
+        return np.array(raw, dtype=np.int64)
 
     def addListener(self, listener):
         listener.slider.value.valueChanged.connect(self.update)

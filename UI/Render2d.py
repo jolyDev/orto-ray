@@ -18,7 +18,7 @@ class WindowX(QMainWindow):
 
         self.setWindowTitle(title)
         self.data = data
-        self.canvas = Canvas(self.data, self, width=8, height=4)
+        self.canvas = Canvas(self.data, self, width=4, height=4)
         self.canvas.move(0, 0)
         self.canvas.mpl_connect('button_press_event', self.onClick)
 

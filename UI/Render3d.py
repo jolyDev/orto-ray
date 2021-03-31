@@ -13,7 +13,7 @@ import pyvista as pv
 from pyvistaqt import QtInteractor
 
 import Style as styling
-class RenderX(QMainWindow):
+class Render3D(QMainWindow):
 
     def __init__(self, data, parent=None, show=True):
         QtWidgets.QMainWindow.__init__(self, parent)
@@ -29,19 +29,9 @@ class RenderX(QMainWindow):
         self.frame.setLayout(vlayout)
         self.setCentralWidget(self.frame)
 
+        self.update(data)
+
+    def update(self, data):
+        self.plotter.clear()
         self.plotter.add_volume(data, cmap=styling._COLOR_STYLE)
-
-        if show:
-            self.show()
-
-    def add_sphere(self):
-        """ add a sphere to the pyqt frame """
-        sphere = pv.Sphere()
-        self.plotter.add_mesh(sphere, show_edges=True)
-        self.plotter.reset_camera()
-
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-    sys.exit(app.exec_())
+        self.show()
