@@ -39,10 +39,27 @@ class DataView(QWidget):
         y = self.vertical_range
         z = self.horizontal_range
 
-        self.scene.update(self.data3d.trim(x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin()))
+        #self.scene.update(self.data3d.trim(x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin()))
+
+        d = self.data3d.trim(x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin())
+        for x in range(d.shape[0]):
+            for y in range(d.shape[1]):
+                for z in range(d.shape[2]):
+                    if x != 300 and y != 300 and z != 30:
+                        d[x, y, z] = 0
+
+        self.scene.update(d)
 
     def update(self):
-        self.scene.update(self._trimBounds())
+
+        d = self._trimBounds()
+        for x in range(d.shape[0]):
+            for y in range(d.shape[1]):
+                for z in range(d.shape[2]):
+                    if x != 50 or y != 50 or z != 50:
+                        d[x, y, z] = 0
+
+        self.scene.update(d)
 
     def rotate(self):
         self.scene.update(self.data3d.getRotated((self.angle_x.value(), self.angle_y.value(), self.angle_z.value())))

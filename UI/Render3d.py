@@ -24,6 +24,7 @@ class Render3D(QMainWindow):
 
         # add the pyvista interactor object
         self.plotter = QtInteractor(self.frame)
+        self.plotter.set_background("royalblue", top="aliceblue")
         vlayout.addWidget(self.plotter.interactor)
 
         self.frame.setLayout(vlayout)
@@ -34,6 +35,6 @@ class Render3D(QMainWindow):
     def update(self, data):
         self.plotter.clear()
         self.plotter.add_bounding_box()
-        self.plotter.add_volume(data, cmap="gray")
-        self.plotter.slice
+        opacity = [0, 0.9, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        self.plotter.add_volume(data, cmap="gray", opacity=opacity)
         self.show()
