@@ -249,11 +249,22 @@ class SliderX(QtWidgets.QWidget):
         self.slider = self.setUpSlider(min, max, horizontal)
         self.callback = callback
 
-        vbox = QVBoxLayout(self)
-        vbox.addWidget(self.slider)
         self.slider.setParent(self)
 
         self.slider.sliderMoved.connect(callback)
+        self.slider.sliderMoved.connect(self.updateValues)
+
+    def updateValues(self):
+        self.min_label.setText(str(self.getMin()))
+        self.max_label.setText(str(self.getMax()))
+
+    def setMin(self, min):
+        self.slider.setLow(int(min))
+        self.min_label.setText(str(self.getMin()))
+
+    def setMax(self, max):
+        self.slider.setHigh(int(max))
+        self.max_label.setText(str(self.getMax()))
 
     def getMin(self):
         return int(self.slider.low())
@@ -278,4 +289,22 @@ class SliderX(QtWidgets.QWidget):
         slider.setLow(min)
         slider.setHigh(max)
         slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
+
+        self.min_label = QLabel(str(min));
+        self.max_label = QLabel(str(max));
+
+        box_layout = None
+        if horizontal:
+            box_layout = QHBoxLayout(self)
+            box_layout.addWidget(self.min_label)
+            box_layout.addWidget(slider)
+            box_layout.addWidget(self.max_label)
+        else:
+            box_layout = QVBoxLayout(self)
+            box_layout.addWidget(self.max_label)
+            box_layout.addWidget(slider)
+            box_layout.addWidget(self.min_label)
+
+        self.setLayout(box_layout)
+
         return slider

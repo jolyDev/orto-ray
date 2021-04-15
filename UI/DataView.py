@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from SliderX import SliderX
 from Core.Projection import View
-import Algorithms.Trim
 from Algorithms.regionGrowth3D import segmentate3D
 import time
 import numpy as np
@@ -40,21 +39,31 @@ class DataView(QWidget):
         y = self.vertical_range
         z = self.horizontal_range
 
-        x_min = x.getMax()
-        x_max = y.getMin()
-        y_min = x.getMin()
-        y_max = y.getMax()
-        z_min = x.getMin()
-        z_max = y.getMax()
-
-        return Algorithms.Trim.Trim(self.data3d.get(), x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin())
+        self.scene.update(self.data3d.trim(x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin()))
 
     def update(self):
         self.scene.update(self._trimBounds())
 
+    def rotate(self):
+        self.scene.update(self.data3d.getRotated((self.angle_x.value(), self.angle_y.value(), self.angle_z.value())))
+
+        self.profile_range.setMinBound(0)
+        self.profile_range.setMin(0)
+        self.profile_range.setMaxBound(self.data3d.getMaxModified(View.FRONTAL))
+        self.vertical_range.setMin(0)
+        self.vertical_range.setMinBound(0)
+        self.vertical_range.setMaxBound(self.data3d.getMaxModified(View.PROFILE))
+        self.horizontal_range.setMin(0)
+        self.horizontal_range.setMinBound(0)
+        self.horizontal_range.setMaxBound(self.data3d.getMaxModified(View.HORIZONTAL))
+
+    def reset(self):
+        self.data3d.resetModification()
+        self.regenerate3d()
+
     def regenerate3d(self):
         start = time.time()
-        data3d = self._trimBounds()
+        data3d = self.data3d.getModified()
 
         mask = segmentate3D(data3d, self.anchors.getRaw3D(), self.hu.slider.getMax(), self.hu.slider.getMin())
         filter_condition = mask == 0
@@ -78,13 +87,41 @@ class DataView(QWidget):
         vbox.addWidget(self.vertical_range)
         vbox.addWidget(self.horizontal_range)
 
-        button = QPushButton('Regenerate 3D')
-        button.clicked.connect(self.regenerate3d)
 
-        button2 = QPushButton('Bounds 3D')
-        button2.clicked.connect(self.update)
+        regenerate = QPushButton('Regenerate 3D')
+        regenerate.clicked.connect(self.regenerate3d)
 
-        vbox.addWidget(button)
-        vbox.addWidget(button2)
+        bounds_update = QPushButton('Bounds 3D')
+        bounds_update.clicked.connect(self._trimBounds)
+
+        reset_modifications = QPushButton('Reset modification')
+        reset_modifications.clicked.connect(self.reset)
+
+        update_buttons_box = QHBoxLayout(self)
+        update_buttons_box.addWidget(regenerate)
+        update_buttons_box.addWidget(bounds_update)
+        update_buttons_box.addWidget(reset_modifications)
+
+        vbox.addLayout(update_buttons_box)
+
+        rotation_box = QHBoxLayout(self)
+
+        self.angle_x = QSpinBox(self)
+        self.angle_y = QSpinBox(self)
+        self.angle_z = QSpinBox(self)
+
+        apply_rotation = QPushButton('Apply rotation')
+        apply_rotation.clicked.connect(self.rotate)
+
+        rotation_box.addWidget(QLabel("Rotation:"))
+        rotation_box.addWidget(QLabel("x = "))
+        rotation_box.addWidget(self.angle_x)
+        rotation_box.addWidget(QLabel("y = "))
+        rotation_box.addWidget(self.angle_y)
+        rotation_box.addWidget(QLabel("z = "))
+        rotation_box.addWidget(self.angle_z)
+        rotation_box.addWidget(apply_rotation)
+
+        vbox.addLayout(rotation_box)
 
         self.setLayout(vbox)

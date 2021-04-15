@@ -25,18 +25,10 @@ class HounsfieldUnitsManager(QWidget):
         hbox_max.addWidget(self.max)
         vbox.addLayout(hbox_max)
 
-        self.slider = SliderX(-default, default, self.dataChanged, False)
+        self.slider = SliderX(-default, default, self.callback, False)
         self.slider.slider.setLow(- default / 4)
         self.slider.slider.setHigh( default / 4)
-
-        self.upper = QLabel(str(self.slider.getMax()))
-        vbox.addWidget(self.upper)
-
         vbox.addWidget(self.slider)
-
-        self.lower = QLabel(str(self.slider.getMin()))
-        vbox.addWidget(self.lower)
-
         hbox_min = QHBoxLayout(self)
         hbox_min.addWidget(QLabel("min"))
         self.min = QSpinBox(self)
@@ -46,14 +38,6 @@ class HounsfieldUnitsManager(QWidget):
         self.min.valueChanged.connect(self.boundsChanged)
         hbox_min.addWidget(self.min)
         vbox.addLayout(hbox_min)
-
-
-    def dataChanged(self):
-        min = self.slider.getMin()
-        max = self.slider.getMax()
-        self.upper.setText(str(max))
-        self.lower.setText(str(min))
-        self.callback()
 
     def boundsChanged(self, value):
         self.slider.setMinBound(int(self.min.value()))

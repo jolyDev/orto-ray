@@ -33,5 +33,6 @@ class Render3D(QMainWindow):
 
     def update(self, data):
         self.plotter.clear()
+        self.plotter.add_bounding_box()
         self.plotter.add_volume(data, cmap=styling._COLOR_STYLE)
         self.show()

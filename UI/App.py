@@ -43,7 +43,7 @@ class Window(QWidget):
 
         self.segmentation2d = Segmentation2DManager()
 
-        self.dicom = DicomDataManager("E:/orto-ray/dicom_data/head")
+        self.dicom = DicomDataManager("E:/orto-ray/dicom_data/Jaw")
         self.hu_manager = HounsfieldUnitsManager(self.segmentation2d.update)
         self.anchors = AnchorPointsManager(self.segmentation2d.update)
         self.render_widget = DataView(self.dicom, self.anchors, self.hu_manager)
