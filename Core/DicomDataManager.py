@@ -3,17 +3,18 @@ import pydicom
 import pydicom.uid
 import numpy as np
 import scipy.ndimage
-#import cupyx.scipy.ndimage
+import cupyx.scipy.ndimage
+import cupy as cp
 from Core.Projection import View
 from Core.Projection import view_to_int
 import Algorithms.Trim
 
 def getSlice(data, index: int, view: View):
-    if view is View.FRONTAL:
+    if view is View.FRONTAL and data.shape[0] >= index:
         return data[index, :, :]
-    elif view is View.PROFILE:
+    elif view is View.PROFILE and data.shape[1] >= index:
         return data[:, index, :]
-    elif view is View.HORIZONTAL:
+    elif view is View.HORIZONTAL and data.shape[2] >= index:
         return data[:, :, index]
 
 class DicomDataManager():
@@ -27,13 +28,19 @@ class DicomDataManager():
         self.origin = []
         self.loadDicom(dicom_rooth_path)
         self.rotation = DicomDataManager.Rotation()
+        self.x_max = 0
+        self.x_min = 0
+        self.y_max = 0
+        self.y_min = 0
+        self.z_max = 0
+        self.z_min = 0
 
     def subscribe(self, listener):
         self.listeners.append(listener)
 
     def _dataChanged(self):
         for subscriber in self.listeners:
-            subscriber.on3DDataChanged(self.modified)
+            subscriber.on3DDataChanged()
 
     def getMax(self, view: View):
         return self.origin.shape[view_to_int(view)]
@@ -42,32 +49,21 @@ class DicomDataManager():
         return self.modified.shape[view_to_int(view)]
 
     def getSlice(self, index: int, view: View):
-        return getSlice(self.origin, index, view)
+        return getSlice(self.modified, index, view)
 
     def get(self):
         return self.origin
 
     def trim(self, x_max, x_min, y_max, y_min, z_max, z_min):
-        x_max = int(x_max)
-        x_min = int(x_min)
-        y_max = int(y_max)
-        y_min = int(y_min)
-        z_max = int(z_max)
-        z_min = int(z_min)
+        self.x_max = int(x_max)
+        self.x_min = int(x_min)
+        self.y_max = int(y_max)
+        self.y_min = int(y_min)
+        self.z_max = int(z_max)
+        self.z_min = int(z_min)
 
-        curr_shape = self.modified.shape
-        if (curr_shape[0] == x_max - x_min and
-            curr_shape[1] == y_max - y_min and
-            curr_shape[2] == z_max - z_min):
-            return self.modified
-
-        if (curr_shape[0] > x_max - x_min and
-            curr_shape[1] > y_max - y_min and
-            curr_shape[2] > z_max - z_min):
-            self.modified = Algorithms.Trim.Trim(self.modified, x_max, x_min, y_max, y_min, z_max, z_min)
-        else:
-            self.modified = Algorithms.Trim.Trim(self.origin, x_max, x_min, y_max, y_min, z_max, z_min)
-
+        self.modified = Algorithms.Trim.Trim(self.origin, self.x_max, self.x_min, self.y_max, self.y_min, self.z_max, self.z_min)
+        self._dataChanged()
         return self.modified
 
     def getRotated(self, angles):
@@ -77,19 +73,21 @@ class DicomDataManager():
         # rotate around x axis
         x = angles[0] - self.rotation.x
         self.rotation.x = x
-        self.modified = scipy.ndimage.interpolation.rotate(self.modified, x, (1, 2))
+        data_gpu = cp.asarray(self.modified)
+        rotated = cupyx.scipy.ndimage.rotate(data_gpu, x, (1, 2), order=1)
 
         # rotate around y axis
         y = angles[1] - self.rotation.y
         self.rotation.y = y
-        self.modified = scipy.ndimage.interpolation.rotate(self.modified, y, (0, 2))
+        rotated = cupyx.scipy.ndimage.rotate(rotated, y, (0, 2), order=1)
 
         # rotate around z axis
         z = angles[2] - self.rotation.z
         self.rotation.z = z
-        self.modified = scipy.ndimage.interpolation.rotate(self.modified, z, (0, 1))
-
-        return np.clip(self.modified, init_min, init_max)
+        rotated = cupyx.scipy.ndimage.rotate(rotated, z, (0, 1), order=1)
+        self.modified = np.clip(cp.asnumpy(rotated), init_min, init_max)
+        self._dataChanged()
+        return self.modified
 
     def getOrigin(self):
         return self.origin

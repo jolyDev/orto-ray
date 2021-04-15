@@ -29,7 +29,7 @@ class SliceView(QWidget):
         self.parent = parent
         self.view = view
         self.dicom = dicom
-        self.slider = Slider(self, 0, self._GetSliderMax(), segmentation2d_callback)
+        self.slider = Slider(self, 0, self.dicom.getMax(self.view), segmentation2d_callback)
         self.anchor_apply = apply_callback
         self.image = Render2d.Render2D(self.getImage(), self.apply, reset_callback)
         #self.pixel_area = self.getPixelArea(self.data_manager.getDimetionsSize())
@@ -42,6 +42,24 @@ class SliceView(QWidget):
 
     def rotate(self, image):
         return np.rot90(image, 3)
+
+    def getMinBoundForView(self):
+        if (self.view == View.PROFILE):
+            min = self.dicom.x_min
+            max = self.dicom.x_max
+        elif (self.view == View.FRONTAL):
+            min = self.dicom.y_min
+            max = self.dicom.y_max
+        elif (self.view == View.HORIZONTAL):
+            min = self.dicom.z_min
+            max = self.dicom.z_max
+
+        return (min, max)
+
+    def on3DDataChanged(self):
+        min, max = self.getMinBoundForView()
+        self.slider.setRange(min, max)
+        self.image.draw(self.getImage())
 
     def resetImage(self):
         self.image.draw(self.getImage())
@@ -64,7 +82,8 @@ class SliceView(QWidget):
         return self.view
 
     def getImage(self):
-        return self.dicom.getSlice(self.slider.getIndex(), self.view)
+        min, max = self.getMinBoundForView()
+        return self.dicom.getSlice(self.slider.getIndex() - int(min), self.view)
 
     def getPixelArea(self, width):
         if self.view == View.FRONTAL:
@@ -73,7 +92,4 @@ class SliceView(QWidget):
             return width[0] * width[2]
         if self.view == View.PROFILE:
             return width[0] * width[1]
-
-    def _GetSliderMax(self):
-        return self.dicom.getMax(self.view)
 

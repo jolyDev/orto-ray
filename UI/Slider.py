@@ -16,22 +16,20 @@ class Slider(QWidget):
 
         hbox = QHBoxLayout()
 
-        sld = QSlider(Qt.Horizontal, self)
-        sld.setRange(min, max - 1)
-        sld.setValue(self.index)
-        sld.setFocusPolicy(Qt.NoFocus)
-        sld.setPageStep(1)
+        self.slider = QSlider(Qt.Horizontal, self)
+        self.slider.setRange(min, max - 1)
+        self.slider.setValue(self.index)
+        self.slider.setFocusPolicy(Qt.NoFocus)
+        self.slider.setPageStep(1)
 
-        sld.valueChanged.connect(self.onDataChanged)
-
-        self.value = sld
+        self.slider.valueChanged.connect(self.onDataChanged)
 
         self.label = QLabel(str(min), self)
         self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         self.label.setMinimumWidth(80)
         self.label.setText(str(self.index))
 
-        hbox.addWidget(sld)
+        hbox.addWidget(self.slider)
         hbox.addSpacing(15)
         hbox.addWidget(self.label)
 
@@ -41,6 +39,17 @@ class Slider(QWidget):
         self.index = value
         self.label.setText(str(value))
         self.callback()
+
+    def setRange(self, min, max):
+        if min > self.slider.value():
+            self.index = min
+
+        if max < self.slider.value():
+            self.index = max
+
+        self.slider.setValue(self.index)
+        self.onDataChanged(self.index)
+        self.slider.setRange(min, max - 1)
 
     def getIndex(self):
         return self.index

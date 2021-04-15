@@ -44,7 +44,7 @@ class Segmentation2DManager():
         index_z = self.horizontal_view.slider.getIndex()
         joint = np.array([index_x, index_y, index_z], dtype=np.int64)
 
-        mask3d = segmentatePlanes(self.dicom.get(), joint, seeds, hu_max, hu_min)
+        mask3d = segmentatePlanes(self.dicom.getModified(), joint, seeds, hu_max, hu_min)
 
         mask_x = getSlice(mask3d, index_x, self.frontal_view.view)
         mask_y = getSlice(mask3d, index_y, self.profile_view.view)

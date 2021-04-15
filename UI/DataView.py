@@ -59,9 +59,13 @@ class DataView(QWidget):
 
     def reset(self):
         self.data3d.resetModification()
-        self.regenerate3d()
+        self.scene.update(self.data3d.getModified())
 
     def regenerate3d(self):
+
+        if len(self.anchors.getRaw3D()) == 0:
+            return
+
         start = time.time()
         data3d = self.data3d.getModified()
 

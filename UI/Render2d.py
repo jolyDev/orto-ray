@@ -60,6 +60,9 @@ class Canvas(FigureCanvas):
         self.draw()
 
     def plotX(self, data, mask):
+        if data is None:
+            return
+
         self.axes.clear()
 
         # plot data
