@@ -4,10 +4,19 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 import sys
 
+class SliderImpl(QSlider):
+
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+
+    def mouseReleaseEvent(self, event):
+        super(QSlider, self).mouseReleaseEvent(event)
+        self.callback()
 
 class Slider(QWidget):
 
-    def __init__(self, parent, min, max, callback):
+    def __init__(self, parent, min, max, callback, release_callback):
         super().__init__()
 
         self.parent = parent
@@ -16,7 +25,8 @@ class Slider(QWidget):
 
         hbox = QHBoxLayout()
 
-        self.slider = QSlider(Qt.Horizontal, self)
+        self.slider = SliderImpl(release_callback)
+        self.slider.setOrientation(Qt.Horizontal)
         self.slider.setRange(min, max - 1)
         self.slider.setValue(self.index)
         self.slider.setFocusPolicy(Qt.NoFocus)

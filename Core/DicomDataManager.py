@@ -17,6 +17,27 @@ def getSlice(data, index: int, view: View):
     elif view is View.HORIZONTAL and data.shape[2] >= index:
         return data[:, :, index]
 
+def rotate(self, data, angles):
+    init_min = data.min()
+    init_max = data.max()
+
+    # rotate around x axis
+    x = angles[0] - self.rotation.x
+    self.rotation.x = x
+    data_gpu = cp.asarray(data)
+    rotated = cupyx.scipy.ndimage.rotate(data_gpu, x, (1, 2), order=1)
+
+    # rotate around y axis
+    y = angles[1] - self.rotation.y
+    self.rotation.y = y
+    rotated = cupyx.scipy.ndimage.rotate(rotated, y, (0, 2), order=1)
+
+    # rotate around z axis
+    z = angles[2] - self.rotation.z
+    self.rotation.z = z
+    rotated = cupyx.scipy.ndimage.rotate(rotated, z, (0, 1), order=1)
+    return np.clip(cp.asnumpy(rotated), init_min, init_max)
+
 class DicomDataManager():
     class Rotation:
         x: float = 0.0

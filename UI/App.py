@@ -43,14 +43,19 @@ class Window(QWidget):
 
         self.segmentation2d = Segmentation2DManager()
 
-        self.dicom = DicomDataManager("E:/orto-ray/dicom_data/Jaw")
+        self.dicom = DicomDataManager("E:/orto-ray/dicom_data/head")
         self.hu_manager = HounsfieldUnitsManager(self.dicom.getModified().max(), self.dicom.getModified().min(), self.segmentation2d.update)
         self.anchors = AnchorPointsManager(self.segmentation2d.update)
-        self.render_widget = DataView(self.dicom, self.anchors, self.hu_manager)
 
         self.frontal_view = SliceView(self, View.FRONTAL, self.dicom, self.anchors.apply, self.anchors.reset, self.segmentation2d.update)
         self.profile_view = SliceView(self, View.PROFILE, self.dicom, self.anchors.apply, self.anchors.reset, self.segmentation2d.update)
         self.horizontal_view = SliceView(self, View.HORIZONTAL, self.dicom, self.anchors.apply, self.anchors.reset, self.segmentation2d.update)
+
+        self.render_widget = DataView(self.dicom, self.frontal_view, self.profile_view, self.horizontal_view, self.anchors, self.hu_manager)
+
+        self.frontal_view.addReleaseCallback(self.render_widget.updateMultiplanar)
+        self.profile_view.addReleaseCallback(self.render_widget.updateMultiplanar)
+        self.horizontal_view.addReleaseCallback(self.render_widget.updateMultiplanar)
 
         self.dicom.subscribe(self.frontal_view)
         self.dicom.subscribe(self.profile_view)

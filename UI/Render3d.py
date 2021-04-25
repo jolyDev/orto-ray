@@ -6,6 +6,7 @@ os.environ["QT_API"] = "pyqt5"
 
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QRadioButton
 
 import numpy as np
 
@@ -30,11 +31,17 @@ class Render3D(QMainWindow):
         self.frame.setLayout(vlayout)
         self.setCentralWidget(self.frame)
 
-        self.update(data)
+        self.update3D(data)
 
-    def update(self, data):
+    def update3D(self, data):
         self.plotter.clear()
         self.plotter.add_bounding_box()
-        opacity = [0, 0.9, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        self.plotter.add_volume(data, cmap="gray")
+        self.show()
+
+    def updateSlice(self, data):
+        self.plotter.clear()
+        self.plotter.add_bounding_box()
+        opacity = [0, 0.1, 0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         self.plotter.add_volume(data, cmap="gray", opacity=opacity)
         self.show()

@@ -29,9 +29,10 @@ class SliceView(QWidget):
         self.parent = parent
         self.view = view
         self.dicom = dicom
-        self.slider = Slider(self, 0, self.dicom.getMax(self.view), segmentation2d_callback)
+        self.slider = Slider(self, 0, self.dicom.getMax(self.view), segmentation2d_callback, self.onMouseRelease)
         self.anchor_apply = apply_callback
         self.image = Render2d.Render2D(self.getImage(), self.apply, reset_callback)
+        self.release_callback = None
         #self.pixel_area = self.getPixelArea(self.data_manager.getDimetionsSize())
 
         self.UiComponents()
@@ -63,6 +64,13 @@ class SliceView(QWidget):
 
     def resetImage(self):
         self.image.draw(self.getImage())
+
+    def addReleaseCallback(self, release_callback):
+        self.release_callback = release_callback
+
+    def onMouseRelease(self):
+        if self.release_callback is not None:
+            self.release_callback()
 
     def overlay(self, mask):
         self.image.drawOverlayed(self.getImage(), mask)
