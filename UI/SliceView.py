@@ -2,8 +2,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import numpy as np
 from Slider import Slider
+import matplotlib
+import datetime
+import os.path
 
-import time
+from numpngw import write_png
+from time import gmtime, strftime
 import Render2d
 from segmentation.segmentation_manager import *
 import Algorithms.regionGrowth2D
@@ -44,6 +48,25 @@ class SliceView(QWidget):
     def rotate(self, image):
         return np.rot90(image, 3)
 
+    def _getName(self):
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.Directory)
+        if dlg.exec_():
+            path = dlg.selectedFiles()
+            return os.path.join(path[0], strftime("%a_%d_%b_%Y_%X", gmtime()).replace(":", "_"))
+
+        return ""
+
+    def saveOne(self):
+        matplotlib.image.imsave(self._getName() + ".png", self.getImage())
+
+    def saveAll(self):
+        min, max = self.getMinBoundForView()
+        name_template = self._getName()
+        for i in range (max - min):
+            image = self.dicom.getSlice(i - int(min), self.view)
+            matplotlib.image.imsave(name_template + '_' + str(i) + '.jpg', image)
+
     def getMinBoundForView(self):
         if (self.view == View.FRONTAL):
             min = self.dicom.x_min
@@ -83,6 +106,17 @@ class SliceView(QWidget):
         vbox.addWidget(self.image)
 
         vbox.addWidget(self.slider)
+
+        hbox = QHBoxLayout(self)
+        save_one = QPushButton("Save one")
+        save_one.clicked.connect(self.saveOne)
+
+        save_all = QPushButton("Save all")
+        save_all.clicked.connect(self.saveAll)
+
+        hbox.addWidget(save_one)
+        hbox.addWidget(save_all)
+        vbox.addLayout(hbox)
 
         self.setLayout(vbox)
 
