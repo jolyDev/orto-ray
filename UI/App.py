@@ -103,7 +103,10 @@ class Window(QWidget):
         hbox.addWidget(self.render_widget)
         hbox.addLayout(grid)
         hbox.addWidget(self.hu_manager)
+        self.setLayout(hbox)
         self.showMaximized()
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

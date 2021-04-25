@@ -28,17 +28,22 @@ class DicomDataManager():
         self.origin = []
         self.loadDicom(dicom_rooth_path)
         self.rotation = DicomDataManager.Rotation()
-        self.x_max = 0
+        self.updateBounds()
+
+    def updateBounds(self):
+        shape = self.modified.shape
+        self.x_max = shape[0] - 1
         self.x_min = 0
-        self.y_max = 0
+        self.y_max = shape[1] - 1
         self.y_min = 0
-        self.z_max = 0
+        self.z_max = shape[2] - 1
         self.z_min = 0
 
     def subscribe(self, listener):
         self.listeners.append(listener)
 
     def _dataChanged(self):
+        self.updateBounds()
         for subscriber in self.listeners:
             subscriber.on3DDataChanged()
 

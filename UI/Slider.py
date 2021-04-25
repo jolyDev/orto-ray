@@ -27,7 +27,7 @@ class Slider(QWidget):
 
         self.slider = SliderImpl(release_callback)
         self.slider.setOrientation(Qt.Horizontal)
-        self.slider.setRange(min, max - 1)
+        self.slider.setRange(min, max)
         self.slider.setValue(self.index)
         self.slider.setFocusPolicy(Qt.NoFocus)
         self.slider.setPageStep(1)
@@ -63,7 +63,7 @@ class Slider(QWidget):
 
         self.slider.setValue(self.index)
         self.onDataChanged(self.index)
-        self.slider.setRange(min, max - 1)
+        self.slider.setRange(min, max)
 
     def getIndex(self):
         return self.index

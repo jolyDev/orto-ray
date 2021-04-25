@@ -114,6 +114,15 @@ class DataView(QWidget):
         self.data3d.rotate(data3d, self.angle_x.value(), self.angle_y.value(), self.angle_z.value())
         self.update()
 
+    def load(self):
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.Directory)
+
+        if dlg.exec_():
+            path = dlg.selectedFiles()
+            print(path)
+            self.data3d.loadDicom(path[0])
+
     def UiComponents(self):
         vbox = QVBoxLayout(self)
 
@@ -139,23 +148,7 @@ class DataView(QWidget):
         vbox.addWidget(self.vertical_range)
         vbox.addWidget(self.horizontal_range)
 
-        # Buttons
-        regenerate = QPushButton('Regenerate 3D')
-        regenerate.clicked.connect(self.regenerate3d)
-
-        bounds_update = QPushButton('Bounds 3D')
-        bounds_update.clicked.connect(self._trimBounds)
-
-        reset_modifications = QPushButton('Reset modification')
-        reset_modifications.clicked.connect(self.reset)
-
-        update_buttons_box = QHBoxLayout(self)
-        update_buttons_box.addWidget(regenerate)
-        update_buttons_box.addWidget(bounds_update)
-        update_buttons_box.addWidget(reset_modifications)
-
-        vbox.addLayout(update_buttons_box)
-
+        #rotation
         rotation_box = QHBoxLayout(self)
 
         self.angle_x = QSpinBox(self)
@@ -175,5 +168,26 @@ class DataView(QWidget):
         rotation_box.addWidget(apply_rotation)
 
         vbox.addLayout(rotation_box)
+
+        # Buttons
+        regenerate = QPushButton('Regenerate 3D')
+        regenerate.clicked.connect(self.regenerate3d)
+
+        bounds_update = QPushButton('Bounds 3D')
+        bounds_update.clicked.connect(self._trimBounds)
+
+        reset_modifications = QPushButton('Reset modification')
+        reset_modifications.clicked.connect(self.reset)
+
+        load_dicom = QPushButton('Load ...')
+        load_dicom.clicked.connect(self.load)
+
+        update_buttons_box = QHBoxLayout(self)
+        update_buttons_box.addWidget(regenerate)
+        update_buttons_box.addWidget(bounds_update)
+        update_buttons_box.addWidget(reset_modifications)
+        update_buttons_box.addWidget(load_dicom)
+
+        vbox.addLayout(update_buttons_box)
 
         self.setLayout(vbox)
