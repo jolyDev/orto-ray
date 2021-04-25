@@ -45,10 +45,10 @@ class SliceView(QWidget):
         return np.rot90(image, 3)
 
     def getMinBoundForView(self):
-        if (self.view == View.PROFILE):
+        if (self.view == View.FRONTAL):
             min = self.dicom.x_min
             max = self.dicom.x_max
-        elif (self.view == View.FRONTAL):
+        elif (self.view == View.PROFILE):
             min = self.dicom.y_min
             max = self.dicom.y_max
         elif (self.view == View.HORIZONTAL):

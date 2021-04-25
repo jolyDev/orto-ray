@@ -53,9 +53,13 @@ class Slider(QWidget):
     def setRange(self, min, max):
         if min > self.slider.value():
             self.index = min
+            self.slider.setValue(self.index)
+            self.callback()
 
         if max < self.slider.value():
             self.index = max
+            self.slider.setValue(self.index)
+            self.callback()
 
         self.slider.setValue(self.index)
         self.onDataChanged(self.index)

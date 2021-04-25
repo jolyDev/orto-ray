@@ -60,6 +60,7 @@ class Window(QWidget):
         self.dicom.subscribe(self.frontal_view)
         self.dicom.subscribe(self.profile_view)
         self.dicom.subscribe(self.horizontal_view)
+        self.dicom.subscribe(self.render_widget)
 
         self.segmentation2d.post_init(self.dicom, self.anchors, self.hu_manager,
                                       self.frontal_view,

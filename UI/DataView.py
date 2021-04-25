@@ -45,65 +45,74 @@ class DataView(QWidget):
         y = self.vertical_range
         z = self.horizontal_range
 
-        self.scene.update(self.data3d.trim(x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin()))
+        self.data3d.trim(x.getMax(), x.getMin(), y.getMax(), y.getMin(), z.getMax(), z.getMin())
+        self.update()
 
     def updateMultiplanar(self):
-        data3d = self.data3d.getOrigin()
+        data3d = self.data3d.getModified()
         if not self.mode_3d.isChecked():
-            x = int(self.frontal_view.slider.getIndex())
-            y = int(self.profile_view.slider.getIndex())
-            z = int(self.horizontal_view.slider.getIndex())
+            x = int(self.frontal_view.slider.getIndex() - self.data3d.x_min)
+            y = int(self.profile_view.slider.getIndex() - self.data3d.y_min)
+            z = int(self.horizontal_view.slider.getIndex() - self.data3d.z_min)
+
             multiplanar = np.zeros_like(data3d)
             multiplanar[x, :, :] = data3d[x, :, :]
             multiplanar[:, y, :] = data3d[:, y, :]
             multiplanar[:, :, z] = data3d[:, :, z]
             self.scene.updateSlice(multiplanar)
+
+    def update3D(self):
+        if np.count_nonzero(self.data3d.getModified()) == 0:
+            self.scene.update3D(np.array([[[0]]], dtype=np.int64))
+        else:
+            self.scene.update3D(self.data3d.getModified())
 
     def update(self):
-        data3d = self.data3d.getOrigin()
         if (self.mode_3d.isChecked()):
-            self.scene.update3D(data3d)
+            self.update3D()
         else:
-            x = int(self.frontal_view.slider.getIndex())
-            y = int(self.profile_view.slider.getIndex())
-            z = int(self.horizontal_view.slider.getIndex())
-            multiplanar = np.zeros_like(data3d)
-            multiplanar[x, :, :] = data3d[x, :, :]
-            multiplanar[:, y, :] = data3d[:, y, :]
-            multiplanar[:, :, z] = data3d[:, :, z]
-            self.scene.updateSlice(multiplanar)
+            self.updateMultiplanar()
+
+    def updateBBoxRange(self):
+        self.profile_range.setMinBound(0)
+        self.profile_range.setMin(0)
+        self.profile_range.setMax(self.data3d.getMaxModified(View.FRONTAL))
+        self.profile_range.setMaxBound(self.data3d.getMaxModified(View.FRONTAL))
+
+        self.vertical_range.setMin(0)
+        self.vertical_range.setMinBound(0)
+        self.vertical_range.setMax(self.data3d.getMaxModified(View.PROFILE))
+        self.vertical_range.setMaxBound(self.data3d.getMaxModified(View.PROFILE))
+
+        self.horizontal_range.setMin(0)
+        self.horizontal_range.setMinBound(0)
+        self.horizontal_range.setMax(self.data3d.getMaxModified(View.HORIZONTAL))
+        self.horizontal_range.setMaxBound(self.data3d.getMaxModified(View.HORIZONTAL))
+
+    def on3DDataChanged(self):
+        self.updateBBoxRange()
+        self.update()
 
     def rotate(self):
-        self.scene.update(self.data3d.getRotated((self.angle_x.value(), self.angle_y.value(), self.angle_z.value())))
-
-        #self.profile_range.setMinBound(0)
-        #self.profile_range.setMin(0)
-        #self.profile_range.setMaxBound(self.data3d.getMaxModified(View.FRONTAL))
-        #self.vertical_range.setMin(0)
-        #self.vertical_range.setMinBound(0)
-        #self.vertical_range.setMaxBound(self.data3d.getMaxModified(View.PROFILE))
-        #self.horizontal_range.setMin(0)
-        #self.horizontal_range.setMinBound(0)
-        #self.horizontal_range.setMaxBound(self.data3d.getMaxModified(View.HORIZONTAL))
+        self.data3d.rotate((self.angle_x.value(), self.angle_y.value(), self.angle_z.value()))
+        self.updateBBoxRange()
+        self.update()
 
     def reset(self):
         self.data3d.resetModification()
-        self.scene.update(self.data3d.getModified())
+        self.scene.update()
 
     def regenerate3d(self):
-        data3d = np.copy(self._trimBounds())
+        if len(self.anchors.getRaw3D()) == 0:
+            return
 
-        if len(self.anchors.getRaw3D()) != 0:
-            mask = segmentate3D(data3d, self.anchors.getRaw3D(), self.hu.slider.getMax(), self.hu.slider.getMin())
-            filter_condition = mask == 0
-            data3d[filter_condition] = 0
+        data3d = self.data3d.getModified
+        mask = segmentate3D(data3d, self.anchors.getRaw3D(), self.hu.slider.getMax(), self.hu.slider.getMin())
+        filter_condition = mask == 0
+        data3d[filter_condition] = 0
 
-        data3d = data_manager.rotate(data3d, self.angle_x.value(), self.angle_y.value(), self.angle_z.value())
-
-        if np.count_nonzero(data3d) == 0:
-            self.scene.update(np.array([[[0]]], dtype=np.int64))
-        else:
-            self.scene.update(data3d)
+        self.data3d.rotate(data3d, self.angle_x.value(), self.angle_y.value(), self.angle_z.value())
+        self.update()
 
     def UiComponents(self):
         vbox = QVBoxLayout(self)

@@ -17,27 +17,6 @@ def getSlice(data, index: int, view: View):
     elif view is View.HORIZONTAL and data.shape[2] >= index:
         return data[:, :, index]
 
-def rotate(self, data, angles):
-    init_min = data.min()
-    init_max = data.max()
-
-    # rotate around x axis
-    x = angles[0] - self.rotation.x
-    self.rotation.x = x
-    data_gpu = cp.asarray(data)
-    rotated = cupyx.scipy.ndimage.rotate(data_gpu, x, (1, 2), order=1)
-
-    # rotate around y axis
-    y = angles[1] - self.rotation.y
-    self.rotation.y = y
-    rotated = cupyx.scipy.ndimage.rotate(rotated, y, (0, 2), order=1)
-
-    # rotate around z axis
-    z = angles[2] - self.rotation.z
-    self.rotation.z = z
-    rotated = cupyx.scipy.ndimage.rotate(rotated, z, (0, 1), order=1)
-    return np.clip(cp.asnumpy(rotated), init_min, init_max)
-
 class DicomDataManager():
     class Rotation:
         x: float = 0.0
@@ -87,7 +66,7 @@ class DicomDataManager():
         self._dataChanged()
         return self.modified
 
-    def getRotated(self, angles):
+    def rotate(self, angles):
         init_min = self.origin.min()
         init_max = self.origin.max()
 
@@ -107,14 +86,19 @@ class DicomDataManager():
         self.rotation.z = z
         rotated = cupyx.scipy.ndimage.rotate(rotated, z, (0, 1), order=1)
         self.modified = np.clip(cp.asnumpy(rotated), init_min, init_max)
+
+        self.x_min = int(0)
+        self.y_min = int(0)
+        self.z_min = int(0)
+
         self._dataChanged()
-        return self.modified
 
     def getOrigin(self):
         return self.origin
 
     def resetModification(self):
         self.modified = self.getOriginDeepCopy()
+        self._dataChanged()
 
     def getOriginDeepCopy(self):
         return np.copy(self.origin)
