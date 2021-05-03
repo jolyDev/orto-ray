@@ -2,12 +2,14 @@ import os
 import pydicom
 import pydicom.uid
 import numpy as np
+import scipy
 import scipy.ndimage
 import cupyx.scipy.ndimage
 import cupy as cp
 from Core.Projection import View
 from Core.Projection import view_to_int
 import Algorithms.Trim
+import SimpleITK
 
 def getSlice(data, index: int, view: View):
     if view is View.FRONTAL and data.shape[0] >= index:
@@ -116,6 +118,18 @@ class DicomDataManager():
         self.modified = self.getOriginDeepCopy()
         self._dataChanged()
 
+    def denoise(self, data):
+        itk_data = SimpleITK.GetImageFromArray(data)
+        itk_data = SimpleITK.CurvatureFlow(itk_data, 0.125, 5)
+        itk_data = SimpleITK.VotingBinaryHoleFilling(image1=itk_data)
+                                          #majorityThreshold=1,
+                                          #backgroundValue=0,
+                                          #foregroundValue=labelWhiteMatter)
+        return np.array(SimpleITK.GetArrayFromImage(itk_data), dtype=np.int64)
+        #data = scipy.ndimage.uniform_filter(data, size=1)
+        #data = scipy.ndimage.gaussian_filter(data, sigma=1)
+        #return data
+
     def loadDicom(self, dicom_rooth_path):
         old_data = self.getOriginDeepCopy()
         try:
@@ -139,7 +153,7 @@ class DicomDataManager():
                 img2d = s.pixel_array
                 self.origin[:, :, i] = np.array(img2d, dtype=np.int64)
 
-            self.origin = np.array(self.origin, dtype=np.int64)
+            self.origin = self.denoise(np.array(self.origin, dtype=np.int64))
             self.modified = self.getOriginDeepCopy()
             self._dataChanged()
         except Exception:
