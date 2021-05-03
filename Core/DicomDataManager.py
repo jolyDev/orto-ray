@@ -9,6 +9,7 @@ import cupy as cp
 from Core.Projection import View
 from Core.Projection import view_to_int
 import Algorithms.Trim
+import cv2
 import SimpleITK
 
 def getSlice(data, index: int, view: View):
@@ -119,13 +120,23 @@ class DicomDataManager():
         self._dataChanged()
 
     def denoise(self, data):
-        itk_data = SimpleITK.GetImageFromArray(data)
-        itk_data = SimpleITK.CurvatureFlow(itk_data, 0.125, 5)
-        itk_data = SimpleITK.VotingBinaryHoleFilling(image1=itk_data)
+        i = 0
+        for slice in data:
+            print()
+
+        return data#np.array(img_dilation, dtype=np.int64)
+
+        #cv2.imshow('Input', img)
+        #cv2.imshow('Erosion', img_erosion)
+        #cv2.imshow('Dilation', img_dilation)
+
+        #itk_data = SimpleITK.GetImageFromArray(data)
+        #itk_data = SimpleITK.CurvatureFlow(itk_data, 0.125, 5)
+        #itk_data = SimpleITK.VotingBinaryHoleFilling(image1=itk_data)
                                           #majorityThreshold=1,
                                           #backgroundValue=0,
                                           #foregroundValue=labelWhiteMatter)
-        return np.array(SimpleITK.GetArrayFromImage(itk_data), dtype=np.int64)
+        #return np.array(SimpleITK.GetArrayFromImage(itk_data), dtype=np.int64)
         #data = scipy.ndimage.uniform_filter(data, size=1)
         #data = scipy.ndimage.gaussian_filter(data, sigma=1)
         #return data
@@ -148,14 +159,22 @@ class DicomDataManager():
             img_shape.append(len(slices))
             self.origin = np.zeros(img_shape)
 
+            kernel = np.ones((5, 5), np.uint8)
+
             # fill 3D array with the images from the files
             for i, s in enumerate(slices):
-                img2d = s.pixel_array
-                self.origin[:, :, i] = np.array(img2d, dtype=np.int64)
+                img2d = np.array(s.pixel_array, dtype=np.int64)
+                self.origin[:, :, i] = img2d
+                img_erosion = cv2.erode(self.origin[:, :, i], kernel, iterations=1)
+                img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
+                i = i + 1
+                if i == 50:
+                    cv2.imshow('Input', img_dilation)
 
-            self.origin = self.denoise(np.array(self.origin, dtype=np.int64))
+            self.origin = np.array(self.origin, dtype=np.int64)
             self.modified = self.getOriginDeepCopy()
             self._dataChanged()
-        except Exception:
+        except Exception as e:
+            print(e)
             self.origin = old_data
             self.modified = old_data

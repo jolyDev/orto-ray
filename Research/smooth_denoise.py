@@ -10,10 +10,7 @@ img_erosion = cv2.erode(img, kernel, iterations=1)
 img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
 
 cv2.imshow('Input', img)
-input()
 cv2.imshow('Erosion', img_erosion)
-input()
 cv2.imshow('Dilation', img_dilation)
-input()
 
 cv2.waitKey(0)
