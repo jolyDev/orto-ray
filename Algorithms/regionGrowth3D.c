@@ -3519,66 +3519,66 @@ static PyObject *__pyx_pf_14regionGrowth3D_segmentate3D(CYTHON_UNUSED PyObject *
  *         near[3][1] = y+1
  *         near[3][2] = z             # <<<<<<<<<<<<<<
  * 
- *         near[5][0] = x
+ *         near[4][0] = x
  */
     ((__pyx_v_near[3])[2]) = __pyx_v_z;
 
     /* "regionGrowth3D.pyx":56
  *         near[3][2] = z
  * 
- *         near[5][0] = x             # <<<<<<<<<<<<<<
- *         near[5][1] = y
- *         near[5][2] = z-1
+ *         near[4][0] = x             # <<<<<<<<<<<<<<
+ *         near[4][1] = y
+ *         near[4][2] = z-1
  */
-    ((__pyx_v_near[5])[0]) = __pyx_v_x;
+    ((__pyx_v_near[4])[0]) = __pyx_v_x;
 
     /* "regionGrowth3D.pyx":57
  * 
+ *         near[4][0] = x
+ *         near[4][1] = y             # <<<<<<<<<<<<<<
+ *         near[4][2] = z-1
+ * 
+ */
+    ((__pyx_v_near[4])[1]) = __pyx_v_y;
+
+    /* "regionGrowth3D.pyx":58
+ *         near[4][0] = x
+ *         near[4][1] = y
+ *         near[4][2] = z-1             # <<<<<<<<<<<<<<
+ * 
+ *         near[5][0] = x
+ */
+    ((__pyx_v_near[4])[2]) = (__pyx_v_z - 1);
+
+    /* "regionGrowth3D.pyx":60
+ *         near[4][2] = z-1
+ * 
+ *         near[5][0] = x             # <<<<<<<<<<<<<<
+ *         near[5][1] = y
+ *         near[5][2] = z+1
+ */
+    ((__pyx_v_near[5])[0]) = __pyx_v_x;
+
+    /* "regionGrowth3D.pyx":61
+ * 
  *         near[5][0] = x
  *         near[5][1] = y             # <<<<<<<<<<<<<<
- *         near[5][2] = z-1
+ *         near[5][2] = z+1
  * 
  */
     ((__pyx_v_near[5])[1]) = __pyx_v_y;
 
-    /* "regionGrowth3D.pyx":58
+    /* "regionGrowth3D.pyx":62
  *         near[5][0] = x
  *         near[5][1] = y
- *         near[5][2] = z-1             # <<<<<<<<<<<<<<
- * 
- *         near[6][0] = x
- */
-    ((__pyx_v_near[5])[2]) = (__pyx_v_z - 1);
-
-    /* "regionGrowth3D.pyx":60
- *         near[5][2] = z-1
- * 
- *         near[6][0] = x             # <<<<<<<<<<<<<<
- *         near[6][1] = y
- *         near[6][2] = z+1
- */
-    ((__pyx_v_near[6])[0]) = __pyx_v_x;
-
-    /* "regionGrowth3D.pyx":61
- * 
- *         near[6][0] = x
- *         near[6][1] = y             # <<<<<<<<<<<<<<
- *         near[6][2] = z+1
- * 
- */
-    ((__pyx_v_near[6])[1]) = __pyx_v_y;
-
-    /* "regionGrowth3D.pyx":62
- *         near[6][0] = x
- *         near[6][1] = y
- *         near[6][2] = z+1             # <<<<<<<<<<<<<<
+ *         near[5][2] = z+1             # <<<<<<<<<<<<<<
  * 
  *         for item in near:
  */
-    ((__pyx_v_near[6])[2]) = (__pyx_v_z + 1);
+    ((__pyx_v_near[5])[2]) = (__pyx_v_z + 1);
 
     /* "regionGrowth3D.pyx":64
- *         near[6][2] = z+1
+ *         near[5][2] = z+1
  * 
  *         for item in near:             # <<<<<<<<<<<<<<
  *             _expand(data3d, mask, queue, item[0], item[1], item[2], max, min)

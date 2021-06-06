@@ -68,13 +68,13 @@ def segmentatePlanes(np.int64_t[:,:,:] data3d, planes_joint, np.int64_t[:,:] see
         near[3][1] = y+1
         near[3][2] = z
 
+        near[4][0] = x
+        near[4][1] = y
+        near[4][2] = z-1
+
         near[5][0] = x
         near[5][1] = y
-        near[5][2] = z-1
-
-        near[6][0] = x
-        near[6][1] = y
-        near[6][2] = z+1
+        near[5][2] = z+1
 
         for item in near:
             _expand(data3d, mask, queue, jx, jy, jz, item[0], item[1], item[2], max, min)
